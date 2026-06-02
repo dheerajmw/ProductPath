@@ -97,6 +97,25 @@ After signup, open the API terminal log for:
 [dev] Email verification link for you@example.com: http://localhost:3000/verify-email?token=...
 ```
 
+## Streamlit portal (Community Cloud)
+
+A lightweight **Streamlit** app documents the platform and can health-check a deployed API.
+
+| File | Purpose |
+|------|---------|
+| `streamlit_app.py` | Main entry for [Streamlit Cloud](https://share.streamlit.io) |
+| `requirements.txt` | Python deps |
+| `.streamlit/config.toml` | Dark theme |
+
+**Deploy:** connect repo [dheerajmw/ProductPath](https://github.com/dheerajmw/ProductPath), main file `streamlit_app.py`. See [docs/streamlit-deploy.md](./docs/streamlit-deploy.md).
+
+```bash
+pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+The full candidate/admin UI remains the Next.js apps below—not Streamlit.
+
 ## Project structure
 
 ```

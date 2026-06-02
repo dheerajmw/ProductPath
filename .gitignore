@@ -8,3 +8,11 @@ dist
 coverage
 .DS_Store
 uploads
+
+# Python / Streamlit
+.venv
+venv
+__pycache__
+*.py[cod]
+.Python
+.streamlit/secrets.toml
