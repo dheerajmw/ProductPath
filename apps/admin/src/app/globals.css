@@ -1,0 +1,23 @@
+@import "@productpath/ui/src/styles.css";
+
+body {
+  margin: 0;
+  color: var(--pp-fg);
+  background: var(--pp-bg);
+  font-family: var(--pp-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--pp-primary);
+}
+
+table {
+  color: var(--pp-fg);
+}
+
+@keyframes pp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

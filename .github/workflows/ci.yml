@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: productpath
+          POSTGRES_PASSWORD: productpath
+          POSTGRES_DB: productpath
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U productpath"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://productpath:productpath@localhost:5432/productpath?schema=public
+      SESSION_SECRET: ci-test-secret-min-32-chars-long
+      NODE_ENV: test
+      API_PORT: 4000
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        continue-on-error: true
+
+      - name: Install dependencies (no lockfile)
+        if: failure()
+        run: pnpm install
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Migrate database
+        run: pnpm --filter @productpath/database exec prisma migrate deploy
+
+      - name: Seed database
+        run: pnpm db:seed
+        env:
+          ADMIN_EMAIL: admin@productpath.local
+          ADMIN_PASSWORD: ci-admin-password
+
+      - name: Lint & typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

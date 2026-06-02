@@ -1,0 +1,165 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  Alert,
+  Spinner,
+  Button,
+  VerificationBadge,
+} from "@productpath/ui";
+import { api, ApiError } from "@/lib/api";
+import { fetchMeCached } from "@/lib/me-cache";
+import { CandidateAppShell } from "@/components/app-shell";
+
+export default function AccountSettingsPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [roleName, setRoleName] = useState<string | null>(null);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationState, setVerificationState] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchMeCached()
+      .then(async (user) => {
+        setDisplayName(user.candidateProfile?.displayName?.trim() || user.email.split("@")[0] || "Member");
+        setEmail(user.email);
+        setEmailVerified(user.emailVerified);
+        setRoleName(user.candidateProfile?.activeRole?.name ?? null);
+
+        if (!user.candidateProfile?.activeRoleId) {
+          router.replace("/onboarding/role");
+          return;
+        }
+
+        try {
+          const verification = await api.getVerification();
+          setVerificationState(verification.state);
+        } catch {
+          setVerificationState(null);
+        }
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 401) router.push("/login");
+        else setError(err instanceof ApiError ? err.message : "Failed to load account");
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
+
+  if (loading) {
+    return (
+      <CandidateAppShell title="My account">
+        <div style={{ display: "flex", justifyContent: "center", padding: 48 }}>
+          <Spinner size={32} />
+        </div>
+      </CandidateAppShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <CandidateAppShell title="My account">
+        <Alert variant="error">{error}</Alert>
+      </CandidateAppShell>
+    );
+  }
+
+  return (
+    <CandidateAppShell title="My account">
+      <Card>
+        <CardContent>
+          <CardTitle>{displayName}</CardTitle>
+          <p
+            className="pp-account-email"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              margin: "10px 0 0",
+              fontSize: "0.9375rem",
+              color: "var(--pp-muted)",
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 20, color: "var(--pp-primary)", flexShrink: 0 }}
+              aria-hidden
+            >
+              mail
+            </span>
+            <span>
+              <span style={{ color: "var(--pp-fg)", fontWeight: 500 }}>Email </span>
+              {email}
+            </span>
+          </p>
+          <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+            {roleName ? (
+              <span className="pp-pill pp-pill--primary">{roleName}</span>
+            ) : null}
+            {emailVerified ? (
+              <span className="pp-pill pp-pill--success">Email verified</span>
+            ) : (
+              <span className="pp-pill pp-pill--primary">Email not verified</span>
+            )}
+          </div>
+          {!emailVerified ? (
+            <div style={{ marginTop: 16 }}>
+              <Alert variant="info">
+                Verify your email from the link in your inbox, or use the dev link on the{" "}
+                <Link href="/verify-email/pending">verification pending</Link> page.
+              </Alert>
+            </div>
+          ) : null}
+          {verificationState ? (
+            <div style={{ marginTop: 16 }}>
+              <VerificationBadge
+                state={
+                  verificationState as
+                    | "LEARNING"
+                    | "EMERGING_TALENT"
+                    | "INTERVIEW_READY"
+                    | "VERIFIED_PROFESSIONAL"
+                }
+              />
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card style={{ marginTop: 24 }}>
+        <CardContent>
+          <CardTitle style={{ fontSize: "1.125rem" }}>Manage</CardTitle>
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start" }}>
+            <Link href="/profile">
+              <Button variant="secondary" size="sm">
+                Verification & checklist
+              </Button>
+            </Link>
+            <Link href="/settings/role">
+              <Button variant="secondary" size="sm">
+                Change product role
+              </Button>
+            </Link>
+            <Link href="/settings/discovery">
+              <Button variant="secondary" size="sm">
+                Recruiter discovery
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm">
+                Command Center
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </CandidateAppShell>
+  );
+}

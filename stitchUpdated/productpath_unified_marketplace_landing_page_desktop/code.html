@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProductPath OS | High-Performance Career Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(22, 29, 49, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(173, 198, 255, 0.2);
+        }
+        body {
+            background-color: #0e1323;
+            color: #dee1f8;
+            overflow-x: hidden;
+        }
+        .bg-gradient-blur {
+            background: radial-gradient(circle at 50% 50%, rgba(69, 94, 144, 0.15) 0%, rgba(14, 19, 35, 0) 70%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#feb685",
+                        "primary-fixed-dim": "#adc6ff",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-secondary-fixed": "#002114",
+                        "on-secondary-container": "#003e28",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed-variant": "#2c4677",
+                        "outline": "#8e909a",
+                        "on-primary-container": "#385283",
+                        "surface-variant": "#2f3446",
+                        "on-secondary-fixed-variant": "#005236",
+                        "border-white-low": "rgba(255, 255, 255, 0.1)",
+                        "inverse-surface": "#dee1f8",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-secondary": "#003824",
+                        "on-tertiary": "#502501",
+                        "on-primary-fixed": "#001a42",
+                        "surface-bright": "#34394a",
+                        "background": "#0e1323",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-glass": "rgba(22, 29, 49, 0.7)",
+                        "on-tertiary-container": "#79451e",
+                        "surface-container-high": "#24293a",
+                        "primary": "#d8e2ff",
+                        "secondary": "#4edea3",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container-low": "#161b2b",
+                        "on-tertiary-fixed": "#301400",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-dim": "#0e1323",
+                        "tertiary": "#ffdbc4",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface": "#0e1323",
+                        "on-primary": "#122f5f",
+                        "inverse-primary": "#455e90",
+                        "surface-container-lowest": "#080d1d",
+                        "surface-container-highest": "#2f3446",
+                        "primary-container": "#adc6ff",
+                        "on-tertiary-fixed-variant": "#6b3a14",
+                        "on-background": "#dee1f8",
+                        "outline-variant": "#44474f",
+                        "error": "#ffb4ab",
+                        "surface-container": "#1a1f30",
+                        "glow-primary": "rgba(173, 198, 255, 0.5)",
+                        "secondary-container": "#00b47d",
+                        "inverse-on-surface": "#2b3041",
+                        "on-surface": "#dee1f8",
+                        "tertiary-fixed-dim": "#ffb786"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "48px",
+                        "section": "120px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-micro": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-micro": ["10px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-white-low shadow-sm h-16">
+<div class="flex justify-between items-center w-full px-lg max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary">ProductPath</span>
+<div class="hidden md:flex gap-lg">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">Roadmaps</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">Community</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md hover:scale-105 transition-transform duration-200" href="#">Opportunities</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary active:scale-95 transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary active:scale-95 transition-all">settings</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-border-white-low" data-alt="A professional headshot of a young male professional in a modern studio setting with soft directional lighting. He has a friendly, confident expression, wearing a clean charcoal sweater. The background is a blurred high-tech office environment with subtle blue and teal ambient lights, maintaining a premium, professional dark-mode aesthetic consistent with a mission-control theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQhvJtZHgU-RiI_gKggyqpDoKf0C8UbKrT9CFZ0K6idI4Rv2y6MXr3IRkO9Gi_u8ZDPf0D4TnVx1sgeVIoNILQ9M4v5zoUfyoaOoG0kz0_wmzGYod1fmVhc5fXBd4lAb4PSvN37ZpBPblqe8lSuiWTfYhOatiO_Ic_AyfWF4k_6NCT4GZ_GUWAaHp7oqumrVZobTQbPSRqX-g73xE8625bEYrq3PALxkBoCG9ofRqsvHx4--Z06iq1wIPKrh_OBivYYz73tTpTNGU"/>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center justify-center overflow-hidden py-section">
+<div class="absolute inset-0 bg-gradient-blur"></div>
+<div class="max-w-container-max mx-auto px-lg text-center relative z-10">
+<div class="inline-flex items-center px-md py-xs rounded-full glass-card text-secondary mb-lg animate-pulse">
+<span class="material-symbols-outlined text-sm mr-sm">verified</span>
+<span class="font-label-caps text-label-caps uppercase">Verified Talent Network</span>
+</div>
+<h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-md">
+                    The Trusted Network for <br class="hidden md:block"/> <span class="text-primary-fixed-dim">Product Talent.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-xl">
+                    Assess skills, build proof through projects, earn verification, and connect with opportunities. The mission control for your professional life.
+                </p>
+<div class="flex flex-col md:flex-row gap-md justify-center">
+<button class="px-xl py-md bg-primary text-on-primary font-bold rounded-lg hover:scale-105 active:scale-95 transition-all shadow-lg glow-primary">
+                        Launch Your Roadmap
+                    </button>
+<button class="px-xl py-md bg-white/5 border border-border-white-low text-on-surface font-bold rounded-lg hover:scale-105 active:scale-95 transition-all backdrop-blur-md">
+                        Hire Verified Talent
+                    </button>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-section bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-lg">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Parallel Journeys</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Designed for high-performance candidates and hiring partners.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-xl">
+<!-- Candidates -->
+<div class="glass-card p-xl rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px]">rocket_launch</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-secondary mb-md">For Candidates</h3>
+<ul class="space-y-md">
+<li class="flex gap-md items-start">
+<div class="bg-secondary/10 p-sm rounded-lg text-secondary"><span class="material-symbols-outlined">assignment_turned_in</span></div>
+<div>
+<p class="font-bold text-on-surface">Skill Assessment</p>
+<p class="text-on-surface-variant text-sm">Validate your product intuition through industry-standard tests.</p>
+</div>
+</li>
+<li class="flex gap-md items-start">
+<div class="bg-secondary/10 p-sm rounded-lg text-secondary"><span class="material-symbols-outlined">folder_special</span></div>
+<div>
+<p class="font-bold text-on-surface">Live Projects</p>
+<p class="text-on-surface-variant text-sm">Build real features and solve product problems in a sandbox environment.</p>
+</div>
+</li>
+<li class="flex gap-md items-start">
+<div class="bg-secondary/10 p-sm rounded-lg text-secondary"><span class="material-symbols-outlined">verified</span></div>
+<div>
+<p class="font-bold text-on-surface">Verification</p>
+<p class="text-on-surface-variant text-sm">Earn the ProductPath Badge, recognized by top tech recruiters.</p>
+</div>
+</li>
+</ul>
+</div>
+<!-- Partners -->
+<div class="glass-card p-xl rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-lg opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px]">corporate_fare</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary-fixed-dim mb-md">For Partners</h3>
+<ul class="space-y-md">
+<li class="flex gap-md items-start">
+<div class="bg-primary/10 p-sm rounded-lg text-primary"><span class="material-symbols-outlined">search</span></div>
+<div>
+<p class="font-bold text-on-surface">Targeted Sourcing</p>
+<p class="text-on-surface-variant text-sm">Filter by verified skills, not just previous company logos.</p>
+</div>
+</li>
+<li class="flex gap-md items-start">
+<div class="bg-primary/10 p-sm rounded-lg text-primary"><span class="material-symbols-outlined">monitoring</span></div>
+<div>
+<p class="font-bold text-on-surface">Data-Driven Insights</p>
+<p class="text-on-surface-variant text-sm">See project performance and raw assessment data for every lead.</p>
+</div>
+</li>
+<li class="flex gap-md items-start">
+<div class="bg-primary/10 p-sm rounded-lg text-primary"><span class="material-symbols-outlined">handshake</span></div>
+<div>
+<p class="font-bold text-on-surface">Seamless Connection</p>
+<p class="text-on-surface-variant text-sm">Bypass the noise and move straight to technical interviews.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Why ProductPath (Comparison Grid) -->
+<section class="py-section relative">
+<div class="max-w-container-max mx-auto px-lg">
+<h2 class="font-headline-lg text-headline-lg text-center text-on-surface mb-xl">The Skill-First Advantage</h2>
+<div class="grid md:grid-cols-2 gap-px bg-border-white-low rounded-xl overflow-hidden glass-card">
+<div class="p-xl bg-surface-container-low">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-lg">TRADITIONAL HIRING</h4>
+<div class="space-y-lg opacity-60">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">close</span>
+<span class="font-body-md text-body-md">Resume keyword scanning</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">close</span>
+<span class="font-body-md text-body-md">Prestige bias (Ivy League/FAANG)</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">close</span>
+<span class="font-body-md text-body-md">Months-long vetting process</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">close</span>
+<span class="font-body-md text-body-md">Static PDF portfolios</span>
+</div>
+</div>
+</div>
+<div class="p-xl bg-surface-container relative">
+<div class="absolute inset-0 bg-primary/5"></div>
+<h4 class="font-label-caps text-label-caps text-primary mb-lg relative">SKILL-FIRST (PRODUCTPATH)</h4>
+<div class="space-y-lg relative">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Verified competency data</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Performance-based signals</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Instant shortlist generation</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Live proof-of-work dashboard</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Platform Preview -->
+<section class="py-section bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-lg">
+<div class="flex flex-col md:flex-row items-center gap-xl">
+<div class="md:w-1/2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Your Career <br/>Mission Control</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">
+                            Track your progress with real-time analytics. Every project you complete updates your skill graph, making you more visible to top-tier partners.
+                        </p>
+<div class="space-y-md">
+<div class="flex items-center gap-md p-md glass-card rounded-lg border-l-4 border-secondary">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+<span class="font-bold text-on-surface">Dynamic Skill DNA Map</span>
+</div>
+<div class="flex items-center gap-md p-md glass-card rounded-lg opacity-60">
+<span class="material-symbols-outlined">ads_click</span>
+<span class="font-bold text-on-surface">Project Execution Workspace</span>
+</div>
+</div>
+</div>
+<div class="md:w-1/2 relative">
+<div class="glass-card rounded-xl overflow-hidden shadow-2xl border-white-low p-md">
+<img alt="Dashboard Preview" class="rounded-lg shadow-inner" data-alt="A high-tech digital dashboard interface shown on a sleek monitor. The UI features complex data visualizations, including a glowing neon skill spider-web chart in secondary green and primary blue. Small, elegant glassmorphic cards display career progression stats and a vertical roadmap line. The environment is a dark, sophisticated workspace with soft atmospheric blue lighting and subtle reflections on the desk surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6OqWeBXuNWDwk6tp-L_foikxndVs00NhuCgnO_sXiPj633MPihhhx8JflU8VHeAuqFtRPNxMU8MoRZz5gqW4Rt2RglE45vEbn2ITXkLoHBYdd7fVr-yu-g01CM_HcumhsaI-Iq0De4a_BC3ih2vVlnqsbOXzW-EP8KPiLVKmfaLSUi-YiBD0Wy8sfTfetsFXuziw1FjAqNFu0Lzpy1mpErS8gOEKA6IO0lu99Ocl5f4PP-BLTagnYuNMafEsKJ0p3Tf7Rwy92cdE"/>
+<div class="absolute -bottom-6 -left-6 glass-card p-md rounded-lg shadow-xl animate-bounce">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-xs font-bold text-secondary">VERIFICATION SECURED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Community Preview -->
+<section class="py-section">
+<div class="max-w-container-max mx-auto px-lg">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Built by Experts</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Join a high-signal community of product leaders and aspiring talent.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-lg">
+<!-- Social Card 1 -->
+<div class="glass-card p-lg rounded-xl hover:scale-105 transition-transform duration-300">
+<div class="flex items-center gap-md mb-md">
+<img alt="Community Member" class="w-12 h-12 rounded-full" data-alt="A professional portrait of a woman with a warm, intelligent smile, set against a background of a modern architectural space with glass and steel. She is wearing a stylish navy blazer. The lighting is bright yet atmospheric, with a shallow depth of field that keeps the focus on her confident expression, fitting the premium technical aesthetic of ProductPath OS." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEX_onH-9vbLg68hgPXgq3opb5vG1r3o6t6jpWyA0nFvnh-V580nSklrSKxIs7j0JY5JgdS7-BynWbxKcYEUj9211Zp4Sy1ctyA-YehFj6udNxftWjTsS3a7QiCVMMjwqMJltB11CAYFgrYcJxuYcr8rp81zIWZFTQxZ09EY4dt29BSRq3cvLT1QmcfSmYfGmPBjxj-00akaTUsAUdhRyJBNrZPi1jdM6wv4dmaJq5VaUkShWjwOcFLoPuRxuhVOb_vHzwH53Ob-g"/>
+<div>
+<p class="font-bold text-on-surface">Sarah J.</p>
+<p class="text-label-caps text-label-caps text-secondary">SR. PRODUCT @ METHA</p>
+</div>
+</div>
+<p class="text-on-surface-variant italic font-body-md">"The roadmap tool helped me identify exactly where my strategy skills were lacking. Six months later, I'm lead of a new division."</p>
+</div>
+<!-- Social Card 2 -->
+<div class="glass-card p-lg rounded-xl hover:scale-105 transition-transform duration-300">
+<div class="flex items-center gap-md mb-md">
+<img alt="Community Member" class="w-12 h-12 rounded-full" data-alt="A professional portrait of a man with a focused and creative demeanor, wearing a black turtleneck. The background consists of a sophisticated, dark-themed office with neon accent lights and tech equipment. The lighting is dramatic and moody, emphasizing a sense of high-performance and technical precision, aligned with the ProductPath OS brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh3FzOr1s7ajyA-Lg0HbFuLCUFptwqaNEhddM0SJdpm80mwtfxhlfLxxCd5bWhaZUbzTUOxvhGq4kkSHqy-WcHAKTtR1pJEUC4BCLgxkSHIeoPX_hSC0IRj5Xmk4fVtief_NdMwHFQJI7hDZ18bdNeZrz0qKzV__SWEj3y02tiAyPMT3eFy6lZUTrc10TxCS2jDsLxRNX5xDczCxPWhgtpM7Bz5tKwYpKnUCld5mzXUiAr7qNckxmfR8niuM-j6U7-VYMNyfKIrcY"/>
+<div>
+<p class="font-bold text-on-surface">Marcus L.</p>
+<p class="text-label-caps text-label-caps text-secondary">VP PRODUCT @ NEURAL</p>
+</div>
+</div>
+<p class="text-on-surface-variant italic font-body-md">"ProductPath is the first platform that actually shows me how a candidate thinks, not just where they went to school. Essential for our team."</p>
+</div>
+<!-- Social Card 3 -->
+<div class="glass-card p-lg rounded-xl hover:scale-105 transition-transform duration-300">
+<div class="flex items-center gap-md mb-md">
+<img alt="Community Member" class="w-12 h-12 rounded-full" data-alt="A professional portrait of a focused woman leader in a high-tech conference room setting. She has a thoughtful expression, wearing a sleek white professional top. Behind her are soft-focus displays showing data and charts. The lighting is crisp and cool-toned, creating a futuristic, organized, and technical mood consistent with the global brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYJfCdzaWftRQqoXJiEWVgRR5B20hiPkwE6_6GaKgYFDWtS1vqu6e-POg6iM_XRDz3HR0VEJeI3MgV8xbXCaWSzF6NMgUfPpqCKYEfJQtMCzxLQ26a6qpV-ZgemquqYhc5xtkIehP9kEgdrYYcTznf80pOpRwO3BJ3ncsmItCgJ7D0FgQRpbVpI9os1Vvxi7oNc3A-Rw-b8ufu7AVg-N_iehsUdmav_f8GQCK83XQdjYOQEGUPFI02U5x2LLoLLJI2J4kLwAmku9M"/>
+<div>
+<p class="font-bold text-on-surface">Elena R.</p>
+<p class="text-label-caps text-label-caps text-secondary">PRODUCT FOUNDER</p>
+</div>
+</div>
+<p class="text-on-surface-variant italic font-body-md">"Finally, a place where product management is treated like the high-stakes science it is. The community signal is incredibly high."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-section">
+<div class="max-w-container-max mx-auto px-lg">
+<div class="glass-card p-xl rounded-2xl text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5"></div>
+<div class="relative z-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Ready to Define Your Path?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-xl mx-auto">
+                            Join 10,000+ product professionals already using ProductPath to build, verify, and excel.
+                        </p>
+<button class="px-xl py-md bg-secondary text-on-secondary font-bold rounded-lg hover:scale-105 active:scale-95 transition-all shadow-lg shadow-secondary/20">
+                            Get Early Access
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-lg mt-auto bg-surface-dim border-t border-border-white-low">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto">
+<div class="mb-md md:mb-0">
+<span class="font-label-caps text-label-caps text-primary">ProductPath OS</span>
+<p class="text-on-surface-variant font-label-micro text-label-micro mt-sm">© 2024 ProductPath OS. All rights reserved.</p>
+</div>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:text-on-surface font-label-micro text-label-micro hover:underline transition-all" href="#">Privacy</a>
+<a class="text-on-surface-variant hover:text-on-surface font-label-micro text-label-micro hover:underline transition-all" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-on-surface font-label-micro text-label-micro hover:underline transition-all" href="#">Recruiters</a>
+</div>
+</div>
+</footer>
+<script>
+        // Subtle interaction for glass cards on mouse move
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+                card.style.borderColor = `rgba(173, 198, 255, 0.4)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = `rgba(255, 255, 255, 0.1)`;
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProductPath | Recruiter Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @font-face {
+            font-family: 'Geist';
+            src: url('https://cdn.jsdelivr.net/npm/geist-font@1.1.0/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: 'Geist';
+            src: url('https://cdn.jsdelivr.net/npm/geist-font@1.1.0/fonts/geist-sans/Geist-Medium.woff2') format('woff2');
+            font-weight: 500;
+        }
+        @font-face {
+            font-family: 'Geist';
+            src: url('https://cdn.jsdelivr.net/npm/geist-font@1.1.0/fonts/geist-sans/Geist-SemiBold.woff2') format('woff2');
+            font-weight: 600;
+        }
+        @font-face {
+            font-family: 'Geist';
+            src: url('https://cdn.jsdelivr.net/npm/geist-font@1.1.0/fonts/geist-sans/Geist-Bold.woff2') format('woff2');
+            font-weight: 700;
+        }
+        
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: #0e1323;
+        }
+
+        .glass-card {
+            background: rgba(26, 31, 48, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(173, 198, 255, 0.3);
+            background: rgba(26, 31, 48, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .accent-glow {
+            background: radial-gradient(circle at center, rgba(173, 198, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .verified-badge {
+            box-shadow: 0 0 12px rgba(78, 222, 163, 0.2);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-container": "#00311f",
+                      "secondary-fixed": "#6ffbbe",
+                      "inverse-surface": "#dee1f9",
+                      "on-background": "#dee1f9",
+                      "tertiary-fixed": "#e1e0ff",
+                      "on-tertiary": "#1000a9",
+                      "primary-container": "#4d8eff",
+                      "secondary-fixed-dim": "#4edea3",
+                      "on-primary-fixed": "#001a42",
+                      "tertiary-fixed-dim": "#c0c1ff",
+                      "surface-container-high": "#25293a",
+                      "primary-fixed-dim": "#adc6ff",
+                      "on-secondary": "#003824",
+                      "surface-container-lowest": "#080d1d",
+                      "tertiary": "#c0c1ff",
+                      "on-tertiary-fixed": "#07006c",
+                      "primary": "#adc6ff",
+                      "outline-variant": "#424754",
+                      "on-primary-fixed-variant": "#004395",
+                      "secondary": "#4edea3",
+                      "inverse-primary": "#005ac2",
+                      "surface-dim": "#0e1323",
+                      "on-secondary-fixed-variant": "#005236",
+                      "surface-container": "#1a1f30",
+                      "on-surface-variant": "#c2c6d6",
+                      "on-primary-container": "#00285d",
+                      "on-error-container": "#ffdad6",
+                      "surface-bright": "#34394a",
+                      "on-secondary-fixed": "#002113",
+                      "on-primary": "#002e6a",
+                      "surface-variant": "#2f3446",
+                      "secondary-container": "#00a572",
+                      "primary-fixed": "#d8e2ff",
+                      "on-tertiary-container": "#0d0096",
+                      "on-surface": "#dee1f9",
+                      "on-error": "#690005",
+                      "inverse-on-surface": "#2b3041",
+                      "tertiary-container": "#8083ff",
+                      "surface": "#0e1323",
+                      "error-container": "#93000a",
+                      "surface-container-low": "#161b2b",
+                      "on-tertiary-fixed-variant": "#2f2ebe",
+                      "background": "#0e1323",
+                      "surface-tint": "#adc6ff",
+                      "outline": "#8c909f",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#2f3446"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "xs": "4px",
+                      "sm": "12px",
+                      "md": "24px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "xl": "80px",
+                      "lg": "48px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Geist"],
+                      "display-lg": ["Geist"],
+                      "body-md": ["Geist"],
+                      "body-lg": ["Geist"],
+                      "display-lg-mobile": ["Geist"],
+                      "code": ["jetbrainsMono"],
+                      "label-md": ["Geist"],
+                      "headline-lg": ["Geist"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "code": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen overflow-hidden">
+<!-- Navigation Drawer (Sidebar) -->
+<aside class="fixed inset-y-0 left-0 z-[60] flex flex-col p-md bg-surface-container-high h-full w-80 shadow-2xl">
+<div class="flex items-center gap-3 mb-xl">
+<span class="font-headline-md text-headline-md text-primary">ProductPath</span>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-primary bg-primary/10 font-semibold transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Network</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-body-md text-body-md">My Roadmaps</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span class="font-body-md text-body-md">Assessments</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">verified</span>
+<span class="font-body-md text-body-md">Verification</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-white/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="Alex Rivera" class="w-full h-full object-cover" data-alt="A professional headshot of a recruitment manager in a sophisticated, dimly lit studio setting. The lighting is focused and warm, highlighting the subject's face against a deep navy blue background. He is wearing a minimalist, modern charcoal suit. The image has a clean, high-performance aesthetic consistent with a premium career platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ-azCvkcO9Gyj1BSCKtYuR5VIfC6wa2UZqRWvmwF_z3izS76_CD1OTOs9Un4bIWfRsnu89_UUAdoY4KA2ma7cRSMM6RUdRKbth8SlmrFEOgn3N8qIGrYX_SYgYDAluw8stam7JyK3FoWWalVXfS9tUFCK7DWQOO2I6zSbph3-TDkpH9LivWcoPIz9fw9cSXUNPo_auuXs36mXtMhRA_T0yANPWbMgjoKMjabJEHLDwjJMnSUA-GXbf6S8nhGsp2ojyX1ZhceaRA"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="font-label-md text-label-md font-semibold text-on-surface truncate">Alex Rivera</p>
+<p class="text-xs text-on-surface-variant truncate">Product Manager</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-80 overflow-y-auto bg-background h-screen">
+<!-- Top App Bar -->
+<header class="h-16 flex items-center justify-between px-gutter sticky top-0 z-50 bg-surface/70 backdrop-blur-xl border-b border-white/10">
+<h1 class="font-headline-md text-headline-md text-on-surface">Talent Overview</h1>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-white/5 rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all w-64 outline-none" placeholder="Search talent..." type="text"/>
+</div>
+<button class="relative p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full border-2 border-background"></span>
+</button>
+</div>
+</header>
+<div class="p-gutter space-y-lg">
+<!-- Metrics Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="glass-card p-md rounded-xl relative overflow-hidden group">
+<div class="accent-glow absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">Interest Requests</span>
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">142</span>
+<span class="text-secondary text-xs font-semibold">+12%</span>
+</div>
+<div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%] rounded-full"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl relative overflow-hidden group">
+<div class="accent-glow absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">Conversion Rate</span>
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">24.8%</span>
+<span class="text-secondary text-xs font-semibold">+3.2%</span>
+</div>
+<div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[45%] rounded-full"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl relative overflow-hidden group">
+<div class="accent-glow absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md">Verified Talent</span>
+<span class="material-symbols-outlined text-tertiary">verified</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg">892</span>
+<span class="text-on-surface-variant text-xs font-semibold">Total Pool</span>
+</div>
+<div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[88%] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Main Grid Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter items-start">
+<!-- Verified Talent Pool Grid -->
+<section class="xl:col-span-8 space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md">Verified Talent Pool</h2>
+<div class="flex gap-2">
+<button class="bg-surface-container-high px-4 py-1.5 rounded-lg text-xs font-semibold border border-white/5 hover:border-white/20 transition-all">Filter</button>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-primary-container transition-all">View All</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Candidate Card 1 -->
+<div class="glass-card p-md rounded-xl space-y-4">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+<img alt="Sarah Chen" class="w-full h-full object-cover" data-alt="Close up portrait of a senior female software engineer in a high-tech modern office environment. Deep blue and emerald color palette. Subtle bokeh lighting in the background showing abstract data visualizations on screens. The professional and sleek atmosphere highlights her role as elite talent." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJYsZXu37lxNkYmKO2lLQDIFwi4IENelS2ad2gNAI_6gyxG6_59NfqldmQt07Y_zb2hn1d4nR8kWYQcSaU2ioMe77PAaRqUqS9SVrnTOfAkb2tqfgrdNFrS8_llbpxjLnCvykXTJA1wab7_o_ptFVHy8ztLZbWlyLUesdAWbwVckk6KmsvMk2YivVwJGM5ecER969LpaQsVvWV4ar3_rJSEvvM6zdU855tApmR--oa8DwW5V3Vcwvysf-8R91M08GBRaUsZ2cZKw"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">Sarah Chen</h3>
+<p class="text-xs text-on-surface-variant">Senior Product Engineer</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-lg verified-badge">verified</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">React</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">System Design</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-primary/20 text-primary font-code shadow-[0_0_8px_rgba(173,198,255,0.2)]">Expert</span>
+</div>
+<div class="pt-2 flex justify-between items-center border-t border-white/5">
+<span class="text-xs text-on-surface-variant">Available: <span class="text-on-surface">2 weeks</span></span>
+<button class="text-primary text-xs font-bold hover:underline">Request CV</button>
+</div>
+</div>
+<!-- Candidate Card 2 -->
+<div class="glass-card p-md rounded-xl space-y-4">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+<img alt="Marcus Thorne" class="w-full h-full object-cover" data-alt="Headshot of a male data scientist with a confident expression. The lighting is crisp and modern with electric blue accents reflecting off a nearby glass surface. The background is a minimalist tech workspace with dark textures and subtle geometric patterns. High performance and professional style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Bq0AiSriHo_4ausLowwCyMLrSX_Wq66nsKydwxN38BiHS1HyImCEYb8aPhFh6Ya1ka1y5KuzrokBTZ1ZmPlw4jMVSfSoTDDVenog1h7WpGnQGB7OAh-rcYIaaw3dIV3a55x6Ex3vJUc3302OfvnB8rz-5ok-xvihvaxRg0avsdcUNZsRj_WdxIA6KsS_VJdpZuN9uyBg0hxkRiJG8PhlwG4E1h1kr_aH6d5AREd1uWD__pAOXrQJuC5sxU9YxT8VfZ3DfSsE4g"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">Marcus Thorne</h3>
+<p class="text-xs text-on-surface-variant">Lead Data Scientist</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-lg verified-badge">verified</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">PyTorch</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">MLOps</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-primary/20 text-primary font-code shadow-[0_0_8px_rgba(173,198,255,0.2)]">Expert</span>
+</div>
+<div class="pt-2 flex justify-between items-center border-t border-white/5">
+<span class="text-xs text-on-surface-variant">Available: <span class="text-on-surface">Immediate</span></span>
+<button class="text-primary text-xs font-bold hover:underline">Request CV</button>
+</div>
+</div>
+<!-- Candidate Card 3 -->
+<div class="glass-card p-md rounded-xl space-y-4">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+<img alt="Elena Rostova" class="w-full h-full object-cover" data-alt="A detailed portrait of a female UI/UX designer. The lighting is artistic and cinematic, with soft shadows and a cool-toned palette of navy and teal. She is in a creative studio with subtle digital design elements in the blurred background. The aesthetic is clean, precise, and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCanjHmuI74BmtH2FmD44SJWABGTLSU8ydyd9Fsjryar9HfcOYYnXZpMWyYdVD_P_AHEQp_X0PY0sF-EnZ5g1fcXdoN6SD3JcYw7SEpe6LF81b_qY7nWSqKtD7mkDWU3sABGJPEIcng74CTMgiZ6GlM1pu8HrfvLBtQqRnvoqZ9N2hrwWOT0rZ0TkjPXfRusm4f-VxPhnE1VlP6g3zYpoV61SZXr_ZItW7OfGhgkYbMVel3-Ctl3VzAQIDlPTo4c12qewx3QZRtrQ"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">Elena Rostova</h3>
+<p class="text-xs text-on-surface-variant">Senior Product Designer</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-lg verified-badge">verified</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">Figma</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">Prototyping</span>
+</div>
+<div class="pt-2 flex justify-between items-center border-t border-white/5">
+<span class="text-xs text-on-surface-variant">Available: <span class="text-on-surface">1 month</span></span>
+<button class="text-primary text-xs font-bold hover:underline">Request CV</button>
+</div>
+</div>
+<!-- Candidate Card 4 -->
+<div class="glass-card p-md rounded-xl space-y-4">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+<img alt="David Park" class="w-full h-full object-cover" data-alt="A portrait of a male technical program manager in a modern, glass-walled skyscraper office overlooking a city at twilight. The scene is lit with warm interior lights contrasting with the cool blue hour outside. He wears a sleek, modern polo shirt. The mood is authoritative, calm, and high-performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJtHBQWmcOqPT5wNo-adNaeODU7FA1OkgwkhDSjSQyEztvpV2NsvJQ0Zae8pCtiHwYuypQvlwSjVGXbrJ41Dsxp3RfuJ69IMVyf94bt3SqVn3CH-vx83Dz-TXOEPChiBFdkz3YKq2i7Ds2iLvKqUQPZKG0eImT2lM-eRdzNPdnT-K8DlWwZQ-oI24ZNBrkxBcK4H4xny4XyiBfLl_HdZZgoJt_Fqd_TrD1BG_a3ebXoCgEDzCggOVmWhXKvHDMXOzIrGUzgEgpqw"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">David Park</h3>
+<p class="text-xs text-on-surface-variant">Technical Program Manager</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-lg verified-badge">verified</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">Agile</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded border border-white/5 font-code">Cloud Arch</span>
+</div>
+<div class="pt-2 flex justify-between items-center border-t border-white/5">
+<span class="text-xs text-on-surface-variant">Available: <span class="text-on-surface">Immediate</span></span>
+<button class="text-primary text-xs font-bold hover:underline">Request CV</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recruiter Insights Sidebar -->
+<aside class="xl:col-span-4 space-y-gutter">
+<div class="glass-card p-md rounded-xl space-y-md">
+<h2 class="font-headline-md text-headline-md">Recruiter Insights</h2>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container rounded-lg border-l-4 border-primary">
+<p class="text-xs text-primary font-bold mb-1 uppercase tracking-wider">Top Skill in Demand</p>
+<p class="text-sm text-on-surface">LLM Orchestration is up <span class="text-secondary font-bold">45%</span> this month.</p>
+</div>
+<div class="space-y-3">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Recent Activity</h3>
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-sm">visibility</span>
+</div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Google</span> viewed Sarah Chen's profile.</p>
+<p class="text-[10px] text-on-surface-variant">2 mins ago</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">mail</span>
+</div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Stripe</span> sent interest to Marcus Thorne.</p>
+<p class="text-[10px] text-on-surface-variant">45 mins ago</p>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-4">Talent Availability Forecast</h3>
+<div class="space-y-3">
+<div class="flex justify-between text-xs">
+<span>Engineering</span>
+<span class="text-on-surface-variant">High Supply</span>
+</div>
+<div class="h-2 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[80%]"></div>
+</div>
+<div class="flex justify-between text-xs mt-2">
+<span>Product Design</span>
+<span class="text-on-surface-variant">Tight Market</span>
+</div>
+<div class="h-2 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[35%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl bg-primary/5 border-primary/20">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h3 class="font-label-md text-label-md text-primary font-bold">Smart Match</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">Based on your recent hires, we recommend looking at <span class="text-on-surface font-semibold">Cloud Native Architects</span> with experience in fintech.</p>
+<button class="w-full mt-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg hover:brightness-110 transition-all">Explore Matches</button>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Micro-interaction JS -->
+<script>
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

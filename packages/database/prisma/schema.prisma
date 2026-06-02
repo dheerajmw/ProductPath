@@ -1,0 +1,713 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlatformRole {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+  REVIEWER
+}
+
+enum ResourceType {
+  ARTICLE
+  VIDEO
+  PDF
+  EXTERNAL_LINK
+}
+
+enum ModuleProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  EXPIRED
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+}
+
+enum SkillDevelopmentStatus {
+  GAP_OPEN
+  IN_PROGRESS
+  MODULES_COMPLETED
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  REVERSED
+}
+
+enum VerificationState {
+  LEARNING
+  EMERGING_TALENT
+  INTERVIEW_READY
+  VERIFIED_PROFESSIONAL
+}
+
+enum InterestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum PostType {
+  TEXT
+  PROJECT_SHARE
+}
+
+enum PostStatus {
+  VISIBLE
+  HIDDEN
+}
+
+enum PostVisibility {
+  PUBLIC
+}
+
+enum ReportTargetType {
+  POST
+  COMMENT
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+enum ModerationActionType {
+  HIDE_POST
+  DISMISS_REPORT
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String?
+  emailVerifiedAt DateTime? @db.Timestamptz
+  platformRole    PlatformRole @default(CANDIDATE)
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @db.Timestamptz
+
+  candidateProfile CandidateProfile?
+  recruiterProfile RecruiterProfile?
+  sessions         Session[]
+  emailTokens      EmailVerificationToken[]
+  auditLogs        AuditLog[]
+  roleSelections      UserRoleSelection[]
+  moduleProgress      UserModuleProgress[]
+  resourceProgress    UserResourceProgress[]
+  assessmentAttempts       AssessmentAttempt[]
+  assessmentResults        AssessmentResult[]
+  learningRecommendations  LearningRecommendation[]
+  skillDevelopmentSnapshots SkillDevelopmentSnapshot[]
+  projectSubmissions       ProjectSubmission[]
+  submissionReviews        SubmissionReview[]       @relation("Reviewer")
+  verificationRecords      VerificationRecord[]
+  discoverySettings        CandidateDiscoverySettings?
+  interestsSent            InterestRequest[]          @relation("RecruiterInterests")
+  interestsReceived        InterestRequest[]          @relation("CandidateInterests")
+  posts                    Post[]
+  comments                 Comment[]
+  likes                    Like[]
+  reportsFiled             Report[]                   @relation("Reporter")
+  moderationActions        ModerationAction[]         @relation("Moderator")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime  @db.Timestamptz
+  usedAt    DateTime? @db.Timestamptz
+  createdAt DateTime  @default(now()) @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model CandidateProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  displayName  String?
+  activeRoleId String?
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeRole Role? @relation("ActiveRole", fields: [activeRoleId], references: [id])
+}
+
+model RecruiterProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  company       String?
+  companyDomain String?
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  activeCandidates CandidateProfile[] @relation("ActiveRole")
+  roadmaps         Roadmap[]
+  roleSelections   UserRoleSelection[]
+  moduleProgress   UserModuleProgress[]
+  skills           Skill[]
+  assessments      Assessment[]
+  assessmentAttempts AssessmentAttempt[]
+  projectTemplates      ProjectTemplate[]
+  projectSubmissions    ProjectSubmission[]
+  verificationRecords   VerificationRecord[]
+  discoverySettingsRole CandidateDiscoverySettings[] @relation("DiscoveryRole")
+}
+
+model Roadmap {
+  id          String   @id @default(cuid())
+  roleId      String
+  version     Int      @default(1)
+  title       String
+  description String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  role    Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  modules Module[]
+
+  @@unique([roleId, version])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  roadmapId   String
+  slug        String
+  title       String
+  description String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  roadmap          Roadmap                @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  resources        Resource[]
+  prerequisites    ModulePrerequisite[]   @relation("DependentModule")
+  prerequisiteFor  ModulePrerequisite[]   @relation("PrerequisiteModule")
+  userProgress     UserModuleProgress[]
+  skillMappings    SkillModuleMapping[]
+
+  @@unique([roadmapId, slug])
+}
+
+model ModulePrerequisite {
+  moduleId       String
+  prerequisiteId String
+
+  module       Module @relation("DependentModule", fields: [moduleId], references: [id], onDelete: Cascade)
+  prerequisite Module @relation("PrerequisiteModule", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+
+  @@id([moduleId, prerequisiteId])
+}
+
+model Resource {
+  id        String       @id @default(cuid())
+  moduleId  String
+  title     String
+  type      ResourceType
+  url       String?
+  content   String?
+  required  Boolean      @default(true)
+  sortOrder Int          @default(0)
+  createdAt DateTime     @default(now()) @db.Timestamptz
+  updatedAt DateTime     @updatedAt @db.Timestamptz
+
+  module           Module                 @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  resourceProgress UserResourceProgress[]
+}
+
+model UserRoleSelection {
+  id         String    @id @default(cuid())
+  userId     String
+  roleId     String
+  active     Boolean   @default(false)
+  archivedAt DateTime? @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, active])
+}
+
+model UserModuleProgress {
+  id          String               @id @default(cuid())
+  userId      String
+  moduleId    String
+  roleId      String
+  status      ModuleProgressStatus @default(NOT_STARTED)
+  completedAt DateTime?            @db.Timestamptz
+  createdAt   DateTime             @default(now()) @db.Timestamptz
+  updatedAt   DateTime             @updatedAt @db.Timestamptz
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId, roleId])
+  @@index([userId, roleId])
+}
+
+model UserResourceProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  resourceId  String
+  completed   Boolean   @default(false)
+  completedAt DateTime? @db.Timestamptz
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model FeatureFlag {
+  key         String  @id
+  enabled     Boolean @default(false)
+  description String?
+}
+
+model AppConfig {
+  key       String @id
+  value     Json
+  version   Int    @default(1)
+  updatedAt DateTime @updatedAt @db.Timestamptz
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  roleId    String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  role              Role?                    @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  questions         Question[]
+  moduleMappings    SkillModuleMapping[]
+  recommendations   LearningRecommendation[]
+  developmentSnapshots SkillDevelopmentSnapshot[]
+}
+
+model Assessment {
+  id              String   @id @default(cuid())
+  roleId          String
+  version         Int      @default(1)
+  title           String
+  description     String?
+  durationMinutes Int      @default(45)
+  published       Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  role      Role                @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  questions Question[]
+  attempts  AssessmentAttempt[]
+
+  @@unique([roleId, version])
+}
+
+model Question {
+  id           String       @id @default(cuid())
+  assessmentId String
+  skillId      String
+  prompt       String
+  type         QuestionType @default(SINGLE_CHOICE)
+  options      Json
+  correctIndex Int
+  sortOrder    Int          @default(0)
+  version      Int          @default(1)
+  createdAt    DateTime     @default(now()) @db.Timestamptz
+  updatedAt    DateTime     @updatedAt @db.Timestamptz
+
+  assessment Assessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  skill      Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  answers    AttemptAnswer[]
+
+  @@index([assessmentId])
+}
+
+model AssessmentAttempt {
+  id                   String        @id @default(cuid())
+  userId               String
+  assessmentId         String
+  roleId               String
+  status               AttemptStatus @default(IN_PROGRESS)
+  assessmentVersion    Int
+  currentQuestionIndex Int           @default(0)
+  startedAt            DateTime      @default(now()) @db.Timestamptz
+  expiresAt            DateTime      @db.Timestamptz
+  submittedAt          DateTime?     @db.Timestamptz
+
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  role       Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  answers    AttemptAnswer[]
+  result     AssessmentResult?
+
+  @@index([userId, assessmentId])
+  @@index([expiresAt])
+}
+
+model AttemptAnswer {
+  id            String   @id @default(cuid())
+  attemptId     String
+  questionId    String
+  selectedIndex Int?
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+
+  attempt  AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+}
+
+model AssessmentResult {
+  id            String   @id @default(cuid())
+  attemptId     String   @unique
+  userId        String
+  roleId        String
+  overallScore  Float
+  passed        Boolean
+  scoresBySkill Json
+  createdAt     DateTime @default(now()) @db.Timestamptz
+
+  attempt             AssessmentAttempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationRecords VerificationRecord[]
+
+  @@index([userId, roleId])
+}
+
+model SkillModuleMapping {
+  id        String   @id @default(cuid())
+  skillId   String
+  moduleId  String
+  priority  Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  skill  Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, moduleId])
+  @@index([skillId])
+}
+
+model LearningRecommendation {
+  id              String   @id @default(cuid())
+  userId          String
+  roleId          String
+  skillId         String
+  sourceAttemptId String
+  moduleIds       Json
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @updatedAt @db.Timestamptz
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId, skillId, sourceAttemptId])
+  @@index([userId, roleId])
+}
+
+model SkillDevelopmentSnapshot {
+  id                   String                 @id @default(cuid())
+  userId               String
+  roleId               String
+  skillId              String
+  status               SkillDevelopmentStatus @default(GAP_OPEN)
+  recommendedCompleted Int                    @default(0)
+  recommendedTotal     Int                    @default(0)
+  sourceAttemptId      String
+  updatedAt            DateTime               @updatedAt @db.Timestamptz
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId, skillId])
+  @@index([userId, roleId])
+}
+
+model ProjectTemplate {
+  id           String   @id @default(cuid())
+  roleId       String
+  slug         String
+  title        String
+  description  String?
+  instructions String
+  rubric       Json
+  published    Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  role        Role                @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  submissions ProjectSubmission[]
+
+  @@unique([roleId, slug])
+}
+
+model ProjectSubmission {
+  id          String           @id @default(cuid())
+  userId      String
+  templateId  String
+  roleId      String
+  version     Int              @default(1)
+  status      SubmissionStatus @default(DRAFT)
+  title       String?
+  narrative   String?
+  artifacts   Json             @default("[]")
+  parentId    String?
+  submittedAt DateTime?        @db.Timestamptz
+  lockedAt    DateTime?        @db.Timestamptz
+  createdAt   DateTime         @default(now()) @db.Timestamptz
+  updatedAt   DateTime         @updatedAt @db.Timestamptz
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template ProjectTemplate    @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  role     Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  parent   ProjectSubmission? @relation("SubmissionVersions", fields: [parentId], references: [id], onDelete: SetNull)
+  children              ProjectSubmission[]  @relation("SubmissionVersions")
+  reviews               SubmissionReview[]
+  verificationAsPrimary VerificationRecord[] @relation("VerificationPrimarySubmission")
+  communityPosts        Post[]
+
+  @@index([userId, templateId])
+  @@index([status])
+  @@index([userId, roleId])
+}
+
+model SubmissionReview {
+  id           String         @id @default(cuid())
+  submissionId String
+  reviewerId   String
+  decision     ReviewDecision
+  feedback     String
+  rubricScores Json
+  createdAt    DateTime       @default(now()) @db.Timestamptz
+
+  submission ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewer   User              @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([reviewerId])
+}
+
+model VerificationRecord {
+  id                 String            @id @default(cuid())
+  userId             String
+  roleId             String
+  state              VerificationState @default(LEARNING)
+  policyVersion      Int               @default(1)
+  assessmentResultId String?
+  primarySubmissionId String?
+  grantedAt          DateTime          @default(now()) @db.Timestamptz
+  expiresAt          DateTime?         @db.Timestamptz
+  createdAt          DateTime          @default(now()) @db.Timestamptz
+  updatedAt          DateTime          @updatedAt @db.Timestamptz
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role              Role               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assessmentResult  AssessmentResult?  @relation(fields: [assessmentResultId], references: [id], onDelete: SetNull)
+  primarySubmission ProjectSubmission? @relation("VerificationPrimarySubmission", fields: [primarySubmissionId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, roleId])
+  @@index([state])
+  @@index([expiresAt])
+}
+
+model CandidateDiscoverySettings {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  roleId       String
+  discoverable Boolean  @default(false)
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation("DiscoveryRole", fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model InterestRequest {
+  id          String         @id @default(cuid())
+  recruiterId String
+  candidateId String
+  message     String
+  status      InterestStatus @default(PENDING)
+  expiresAt   DateTime?      @db.Timestamptz
+  createdAt   DateTime       @default(now()) @db.Timestamptz
+  updatedAt   DateTime       @updatedAt @db.Timestamptz
+
+  recruiter  User        @relation("RecruiterInterests", fields: [recruiterId], references: [id], onDelete: Cascade)
+  candidate  User        @relation("CandidateInterests", fields: [candidateId], references: [id], onDelete: Cascade)
+  connection Connection?
+
+  @@index([recruiterId, status])
+  @@index([candidateId, status])
+  @@index([expiresAt])
+}
+
+model Connection {
+  id                String   @id @default(cuid())
+  interestRequestId String   @unique
+  contactRevealedAt DateTime @default(now()) @db.Timestamptz
+
+  interestRequest InterestRequest @relation(fields: [interestRequestId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id                  String         @id @default(cuid())
+  authorId            String
+  type                PostType       @default(TEXT)
+  body                String
+  visibility          PostVisibility @default(PUBLIC)
+  status              PostStatus     @default(VISIBLE)
+  projectSubmissionId String?
+  createdAt           DateTime       @default(now()) @db.Timestamptz
+  updatedAt           DateTime       @updatedAt @db.Timestamptz
+
+  author            User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  projectSubmission ProjectSubmission? @relation(fields: [projectSubmissionId], references: [id], onDelete: SetNull)
+  comments          Comment[]
+  likes             Like[]
+  reports           Report[]
+
+  @@index([authorId])
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String     @id @default(cuid())
+  postId    String
+  authorId  String
+  body      String
+  parentId  String?
+  status    PostStatus @default(VISIBLE)
+  createdAt DateTime   @default(now()) @db.Timestamptz
+  updatedAt DateTime   @updatedAt @db.Timestamptz
+
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentThread")
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Report {
+  id         String           @id @default(cuid())
+  reporterId String
+  targetType ReportTargetType
+  targetId   String
+  postId     String?
+  reason     String
+  status     ReportStatus     @default(PENDING)
+  createdAt  DateTime         @default(now()) @db.Timestamptz
+  updatedAt  DateTime         @updatedAt @db.Timestamptz
+
+  reporter          User               @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  post              Post?              @relation(fields: [postId], references: [id], onDelete: SetNull)
+  moderationActions ModerationAction[]
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
+}
+
+model ModerationAction {
+  id          String               @id @default(cuid())
+  reportId    String
+  moderatorId String
+  action      ModerationActionType
+  note        String?
+  createdAt   DateTime             @default(now()) @db.Timestamptz
+
+  report    Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  moderator User   @relation("Moderator", fields: [moderatorId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}

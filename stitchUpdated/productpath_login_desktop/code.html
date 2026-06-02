@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | ProductPath OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#feb685",
+                        "primary-fixed-dim": "#adc6ff",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-secondary-fixed": "#002114",
+                        "on-secondary-container": "#003e28",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed-variant": "#2c4677",
+                        "outline": "#8e909a",
+                        "on-primary-container": "#385283",
+                        "surface-variant": "#2f3446",
+                        "on-secondary-fixed-variant": "#005236",
+                        "border-white-low": "rgba(255, 255, 255, 0.1)",
+                        "inverse-surface": "#dee1f8",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-secondary": "#003824",
+                        "on-tertiary": "#502501",
+                        "on-primary-fixed": "#001a42",
+                        "surface-bright": "#34394a",
+                        "background": "#0e1323",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-glass": "rgba(22, 29, 49, 0.7)",
+                        "on-tertiary-container": "#79451e",
+                        "surface-container-high": "#24293a",
+                        "primary": "#d8e2ff",
+                        "secondary": "#4edea3",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container-low": "#161b2b",
+                        "on-tertiary-fixed": "#301400",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-dim": "#0e1323",
+                        "tertiary": "#ffdbc4",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface": "#0e1323",
+                        "on-primary": "#122f5f",
+                        "inverse-primary": "#455e90",
+                        "surface-container-lowest": "#080d1d",
+                        "surface-container-highest": "#2f3446",
+                        "primary-container": "#adc6ff",
+                        "on-tertiary-fixed-variant": "#6b3a14",
+                        "on-background": "#dee1f8",
+                        "outline-variant": "#44474f",
+                        "error": "#ffb4ab",
+                        "surface-container": "#1a1f30",
+                        "glow-primary": "rgba(173, 198, 255, 0.5)",
+                        "secondary-container": "#00b47d",
+                        "inverse-on-surface": "#2b3041",
+                        "on-surface": "#dee1f8",
+                        "tertiary-fixed-dim": "#ffb786"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "48px",
+                        "section": "120px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-micro": ["Inter"],
+                        "label-caps": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e1323;
+            overflow-x: hidden;
+        }
+        .atmospheric-blur {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.15;
+        }
+        .glass-card {
+            background: rgba(22, 29, 49, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(216, 226, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(173, 198, 255, 0.1);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 20px rgba(173, 198, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface flex flex-col min-h-screen">
+<!-- Atmospheric Background Elements -->
+<div class="atmospheric-blur bg-primary-container top-[-200px] left-[-100px]"></div>
+<div class="atmospheric-blur bg-secondary top-[40%] right-[-200px]"></div>
+<div class="atmospheric-blur bg-tertiary bottom-[-200px] left-[20%]"></div>
+<!-- Navigation Shell Suppressed for Transactional Focus -->
+<main class="flex-grow flex items-center justify-center px-md py-xl">
+<div class="w-full max-w-container-max mx-auto flex flex-col items-center">
+<!-- Brand Anchor -->
+<div class="mb-xl text-center">
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight mb-xs">
+                    ProductPath
+                </h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">
+                    Professional OS for Product Leaders
+                </p>
+</div>
+<div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-lg" id="role-selection">
+<!-- User Type: Product Professional -->
+<div class="glass-card p-xl rounded-xl flex flex-col items-center text-center group cursor-pointer" onclick="selectRole('professional')">
+<div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center mb-lg border border-primary/20 group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Product Professional</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">
+                        Optimize your career trajectory, track high-impact outcomes, and navigate your professional roadmap with precision.
+                    </p>
+<div class="mt-auto w-full">
+<button class="w-full py-md px-lg bg-primary text-on-primary font-bold rounded-lg glow-button active:scale-95 transition-all">
+                            Enter Platform
+                        </button>
+</div>
+</div>
+<!-- User Type: Hiring Partner -->
+<div class="glass-card p-xl rounded-xl flex flex-col items-center text-center group cursor-pointer" onclick="selectRole('hiring')">
+<div class="w-16 h-16 rounded-full bg-secondary-container/10 flex items-center justify-center mb-lg border border-secondary/20 group-hover:border-secondary/50 transition-colors">
+<span class="material-symbols-outlined text-secondary text-3xl">handshake</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-secondary mb-md">Hiring Partner</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">
+                        Access verified performance data, streamline technical assessments, and identify elite talent for mission-critical roles.
+                    </p>
+<div class="mt-auto w-full">
+<button class="w-full py-md px-lg bg-surface-variant text-on-surface font-bold rounded-lg border border-border-white-low hover:bg-surface-bright active:scale-95 transition-all">
+                            Access Portal
+                        </button>
+</div>
+</div>
+</div>
+<!-- Alternate Login Option -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Already have an account? 
+                    <a class="text-primary hover:underline transition-all" href="#">Sign in here</a>
+</p>
+</div>
+<!-- Trusted Partners / Decorative Element -->
+<div class="mt-section opacity-40">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-lg text-center">Powering growth at global leaders</p>
+<div class="flex flex-wrap justify-center gap-xl grayscale">
+<img class="h-6 opacity-60" data-alt="A minimalist tech logo for a futuristic enterprise software company, styled in a sleek monochromatic silver with sharp geometric edges, presented against a deep navy background with subtle glassmorphic reflections and neon blue ambient highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxkM5wg7DH_Y1hRXIP-OjuyiOF_H6xR_aa8MCjrepCmkp8MgvWKYVGUuzTK474oEmsd81N8SqnfjGsTw6H4BAASChqb57Bvj04MfdS-fE_jjnm2xO6lE5URC0lkIniQV1yyD-EthbuwUbfIfG7yQ0rWsOvK6XKvtc2wna2JQ8c7oxX1TRk2ooWjjBUr3w4PSFO4FS66rBAoJ0WzwnMaYqrbvQvVVRgt1AicEu3XSe9j_8Oc4UIayKc0X_qwKxh2PSKpjCq5YP6quk"/>
+<img class="h-6 opacity-60" data-alt="A modern, abstract digital corporate logo featuring interlocking minimalist circles in a clean white aesthetic, positioned in a high-tech environment with dark blue lighting and subtle atmospheric particle effects that suggest a high-performance cloud infrastructure company." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMwI8TyOl6b_vVU4c9uUQFEZxiv7x9Gbf7WD-9Q1dn6rp9c1c7vZlYjYR13KV7R0UHf4X_5tAbF5IjLtEDDcU4qCdpgpMXkr7d_rHdvkurISDNFRE4oWUFwViH_oLDFt1J21qsCzoNJRsYoeu4KMVGA0imj9LP_YFS9AdC_NxQCiNUJnGIUPGpQZxbsC653azxQxNey2e24T77C3b8cQaj9LNQdkAfdQ9cvlNXG2RCfDAZTkGLnahSOJCj1rufDtaSNCg4ihMgjww"/>
+<img class="h-6 opacity-60" data-alt="A sophisticated typographic logo for a global fintech platform, featuring bold, wide sans-serif lettering in a bright cyan accent color, set against a dark, textured tech-focused backdrop with soft depth-of-field effects and professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaz7E_hcTN9MaGluOMWk9BCts2kYAVbp6pzr3O3iH87ClDqoGqD_IDUrvfYcdK7xc0dXnPJuK2lw4Xc16WyNhDITlUiy4A67c8Qps2DUppGKGZmCBWZFfcLSUO4eYTWVX4ogceeKWxBU_kuIHKlJWSSVNjbEvLRT2X2t1wjR7Hs9jFfno1R4Dum6iuPNkaYFP0yHsmQhWtmHdJiGDHdgsNtyXMBCql9aCvPkQe_Ctz_CnYnScUva88bvMCFCS2hO6zEm7tFuPCKRA"/>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer from Shared Components JSON -->
+<footer class="w-full py-lg mt-auto border-t border-border-white-low bg-surface-dim">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto">
+<span class="font-label-caps text-label-caps text-primary mb-md md:mb-0">ProductPath OS</span>
+<span class="font-label-micro text-label-micro text-on-surface-variant">© 2024 ProductPath OS. All rights reserved.</span>
+<div class="flex space-x-md mt-md md:mt-0">
+<a class="font-label-micro text-label-micro text-on-surface-variant hover:text-on-surface hover:underline transition-all" href="#">Privacy</a>
+<a class="font-label-micro text-label-micro text-on-surface-variant hover:text-on-surface hover:underline transition-all" href="#">Terms</a>
+<a class="font-label-micro text-label-micro text-on-surface-variant hover:text-on-surface hover:underline transition-all" href="#">Recruiters</a>
+</div>
+</div>
+</footer>
+<script>
+        function selectRole(role) {
+            console.log('Role selected:', role);
+            // Interactive feedback for role selection
+            const cards = document.querySelectorAll('.glass-card');
+            cards.forEach(card => {
+                card.style.opacity = '0.5';
+                card.style.transform = 'scale(0.98)';
+            });
+            const selectedCard = event.currentTarget;
+            selectedCard.style.opacity = '1';
+            selectedCard.style.transform = 'scale(1.02)';
+            selectedCard.style.borderColor = role === 'professional' ? 'var(--tw-color-primary)' : 'var(--tw-color-secondary)';
+            
+            // In a real app, this would redirect or show the login form for that role
+        }
+
+        // Lightweight mouse-following glow effect
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            const glow = document.querySelector('.atmospheric-blur');
+            if (glow) {
+                // Subtle parallax for the main atmospheric element
+                glow.style.transform = `translate(${x * 0.05}px, ${y * 0.05}px)`;
+            }
+        });
+    </script>
+</body></html>
