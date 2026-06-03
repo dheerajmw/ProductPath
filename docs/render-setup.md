@@ -44,6 +44,7 @@ corepack enable
 corepack prepare pnpm@9.15.0 --activate
 pnpm install --frozen-lockfile
 pnpm db:generate
+pnpm db:migrate:deploy
 pnpm --filter @productpath/api build
 ```
 
@@ -73,6 +74,7 @@ npm install -g corepack@latest
 corepack enable
 pnpm install --frozen-lockfile
 pnpm db:generate
+pnpm db:migrate:deploy
 pnpm --filter @productpath/api build
 ```
 
