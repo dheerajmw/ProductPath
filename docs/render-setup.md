@@ -28,6 +28,7 @@ When you apply the Blueprint, Render asks for every variable with `sync: false`.
 | Blueprint not found | Use branch **`main`**, repo root, file `render.yaml` |
 | Build fails on pnpm | Use latest `render.yaml` (corepack + multiline `buildCommand`) |
 | **Exited with status 1** during build | Usually outdated `pnpm-lock.yaml` — pull latest `main` (lockfile must match `apps/api/package.json`) |
+| `pre-deploy command is not supported for free tier` | Remove `preDeployCommand` from Blueprint — use latest `render.yaml` (migrations in `buildCommand`) |
 
 ### Build failed (`Exited with status 1`)
 
@@ -75,13 +76,9 @@ pnpm db:generate
 pnpm --filter @productpath/api build
 ```
 
-**Pre-deploy command** (optional, Settings → Pre-deploy):
-
-```bash
-pnpm db:migrate:deploy
-```
-
 4. **Environment** variables:
+
+> **Free tier:** Render does not support **Pre-deploy** commands. Migrations run in the **Build Command** (see `render.yaml`). Set `DATABASE_URL` before the first deploy.
 
 | Key | Value |
 |-----|--------|

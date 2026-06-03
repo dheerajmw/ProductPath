@@ -17,8 +17,8 @@ services:
       corepack prepare pnpm@9.15.0 --activate
       pnpm install --frozen-lockfile
       pnpm db:generate
+      pnpm db:migrate:deploy
       pnpm --filter @productpath/api build
-    preDeployCommand: pnpm db:migrate:deploy
     startCommand: pnpm --filter @productpath/api start
     healthCheckPath: /health
     envVars:
