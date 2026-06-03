@@ -18,8 +18,10 @@ Vercel **Storage → Postgres** with migrations applied. See [vercel-postgres.md
 ## Step 2 — Deploy API on Render (free)
 
 1. Push this repo to GitHub.
-2. [dashboard.render.com](https://dashboard.render.com) → **New +** → **Blueprint** → connect **ProductPath** repo (uses `render.yaml`),  
-   **or** **New Web Service** manually:
+2. [dashboard.render.com](https://dashboard.render.com) → **New +** → **Blueprint** → connect **ProductPath** repo (uses `render.yaml`).  
+   **When prompted, fill every `sync: false` field** (see [render-setup.md](./render-setup.md)).  
+   If Blueprint shows errors, use **Manual Web Service** in [render-setup.md](./render-setup.md),  
+   **or** manual settings:
 
 | Setting | Value |
 |---------|--------|
