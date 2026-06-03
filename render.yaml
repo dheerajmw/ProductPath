@@ -14,6 +14,7 @@ services:
     buildCommand: |
       npm install -g corepack@latest
       corepack enable
+      corepack prepare pnpm@9.15.0 --activate
       pnpm install --frozen-lockfile
       pnpm db:generate
       pnpm --filter @productpath/api build
@@ -21,6 +22,8 @@ services:
     startCommand: pnpm --filter @productpath/api start
     healthCheckPath: /health
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
       - key: SESSION_SECRET

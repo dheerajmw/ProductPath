@@ -27,6 +27,24 @@ When you apply the Blueprint, Render asks for every variable with `sync: false`.
 | `plan: free` not allowed | Add a payment method to Render (Hobby plan), or change `plan: starter` in `render.yaml` |
 | Blueprint not found | Use branch **`main`**, repo root, file `render.yaml` |
 | Build fails on pnpm | Use latest `render.yaml` (corepack + multiline `buildCommand`) |
+| **Exited with status 1** during build | Usually outdated `pnpm-lock.yaml` — pull latest `main` (lockfile must match `apps/api/package.json`) |
+
+### Build failed (`Exited with status 1`)
+
+Render runs `pnpm install --frozen-lockfile`. If the lockfile is out of date with `package.json`, install fails.
+
+**Fix for maintainers:** run `pnpm install` locally, commit `pnpm-lock.yaml`, push to `main`, redeploy.
+
+**Build command** (must match `render.yaml`):
+
+```bash
+npm install -g corepack@latest
+corepack enable
+corepack prepare pnpm@9.15.0 --activate
+pnpm install --frozen-lockfile
+pnpm db:generate
+pnpm --filter @productpath/api build
+```
 
 ---
 
