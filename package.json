@@ -9,6 +9,7 @@
     "test": "turbo run test",
     "db:generate": "pnpm --filter @productpath/database generate",
     "db:migrate": "pnpm --filter @productpath/database migrate:dev",
+    "db:migrate:deploy": "pnpm --filter @productpath/database migrate:deploy",
     "db:push": "pnpm --filter @productpath/database push",
     "db:seed": "pnpm --filter @productpath/database seed",
     "db:studio": "pnpm --filter @productpath/database studio"

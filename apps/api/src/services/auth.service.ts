@@ -2,6 +2,7 @@ import { prisma, PlatformRole } from "@productpath/database";
 import {
   EMAIL_VERIFY_HOURS,
   SESSION_DAYS,
+  normalizeEmail,
   type LoginInput,
   type SignupInput,
 } from "@productpath/shared";
@@ -39,8 +40,19 @@ export function toPublicUser(user: {
   };
 }
 
+async function findUserByEmail(email: string) {
+  const normalized = normalizeEmail(email);
+  const exact = await prisma.user.findUnique({ where: { email: normalized } });
+  if (exact) return exact;
+
+  return prisma.user.findFirst({
+    where: { email: { equals: normalized, mode: "insensitive" } },
+  });
+}
+
 export async function signup(input: SignupInput, ipAddress?: string) {
-  const existing = await prisma.user.findUnique({ where: { email: input.email } });
+  const email = normalizeEmail(input.email);
+  const existing = await findUserByEmail(email);
   if (existing) {
     throw new AuthError("An account with this email already exists", 409, "EMAIL_EXISTS");
   }
@@ -49,7 +61,7 @@ export async function signup(input: SignupInput, ipAddress?: string) {
 
   const user = await prisma.user.create({
     data: {
-      email: input.email,
+      email,
       passwordHash,
       platformRole: PlatformRole.CANDIDATE,
       candidateProfile: {
@@ -88,7 +100,8 @@ export async function signup(input: SignupInput, ipAddress?: string) {
 }
 
 export async function login(input: LoginInput, ipAddress?: string) {
-  const user = await prisma.user.findUnique({ where: { email: input.email } });
+  const email = normalizeEmail(input.email);
+  const user = await findUserByEmail(email);
   if (!user?.passwordHash) {
     throw new AuthError("Invalid email or password", 401, "INVALID_CREDENTIALS");
   }
@@ -96,6 +109,10 @@ export async function login(input: LoginInput, ipAddress?: string) {
   const valid = await bcrypt.compare(input.password, user.passwordHash);
   if (!valid) {
     throw new AuthError("Invalid email or password", 401, "INVALID_CREDENTIALS");
+  }
+
+  if (user.email !== email) {
+    await prisma.user.update({ where: { id: user.id }, data: { email } });
   }
 
   const session = await createSession(user.id);
@@ -166,7 +183,7 @@ export async function verifyEmail(token: string) {
 }
 
 export async function resendVerification(email: string) {
-  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+  const user = await findUserByEmail(normalizeEmail(email));
   if (!user || user.emailVerifiedAt) {
     return { message: "If an account exists, a verification email has been sent." };
   }

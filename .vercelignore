@@ -1,0 +1,11 @@
+# Faster uploads — frontend deploy does not need these
+apps/api
+apps/admin
+uploads
+.venv
+venv
+__pycache__
+streamlit_app.py
+requirements.txt
+stitchResources
+stitchUpdated

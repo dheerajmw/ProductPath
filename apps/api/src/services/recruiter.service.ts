@@ -2,7 +2,7 @@ import { prisma, PlatformRole } from "@productpath/database";
 import bcrypt from "bcryptjs";
 import { AuthError, toPublicUser } from "./auth.service.js";
 import { generateToken, addHours } from "../lib/tokens.js";
-import { EMAIL_VERIFY_HOURS } from "@productpath/shared";
+import { EMAIL_VERIFY_HOURS, normalizeEmail } from "@productpath/shared";
 import { sendVerificationEmail } from "../lib/email.js";
 import { writeAudit } from "../lib/audit.js";
 
@@ -23,13 +23,14 @@ export async function recruiterSignup(
   input: { email: string; password: string; company: string; companyDomain?: string },
   ipAddress?: string,
 ) {
-  const existing = await prisma.user.findUnique({ where: { email: input.email } });
+  const email = normalizeEmail(input.email);
+  const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     throw new AuthError("An account with this email already exists", 409, "EMAIL_EXISTS");
   }
 
   const passwordHash = await bcrypt.hash(input.password, 12);
-  const emailDomain = input.email.split("@")[1]?.toLowerCase();
+  const emailDomain = email.split("@")[1];
   const autoVerify =
     input.companyDomain &&
     emailDomain &&
@@ -37,7 +38,7 @@ export async function recruiterSignup(
 
   const user = await prisma.user.create({
     data: {
-      email: input.email,
+      email,
       passwordHash,
       platformRole: PlatformRole.RECRUITER,
       recruiterProfile: {

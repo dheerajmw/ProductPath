@@ -1,4 +1,18 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:4000";
+
+function assertProductionApiUrl() {
+  if (typeof window === "undefined") return;
+  if (process.env.NODE_ENV !== "production") return;
+  if (/localhost|127\.0\.0\.1/.test(API_URL)) {
+    console.error(
+      "[ProductPath] NEXT_PUBLIC_API_URL points at localhost in production. " +
+        "Deploy apps/api (see docs/vercel-production.md) and set NEXT_PUBLIC_API_URL on Vercel.",
+    );
+  }
+}
+
+assertProductionApiUrl();
 
 export class ApiError extends Error {
   constructor(
@@ -12,14 +26,23 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...init,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
+    });
+  } catch {
+    throw new ApiError(
+      `Cannot reach the API at ${API_URL}. Start the API locally (pnpm dev) or set NEXT_PUBLIC_API_URL on Vercel.`,
+      0,
+      "NETWORK_ERROR",
+    );
+  }
 
   const data = await res.json().catch(() => ({}));
 

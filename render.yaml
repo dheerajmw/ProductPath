@@ -1,0 +1,32 @@
+# Render Blueprint — ProductPath API (free tier)
+# Docs: docs/vercel-production.md
+#
+# After deploy, set on Vercel (web): NEXT_PUBLIC_API_URL=https://<this-service>.onrender.com
+
+services:
+  - type: web
+    name: productpath-api
+    runtime: node
+    plan: free
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
+      pnpm db:generate &&
+      pnpm --filter @productpath/api build
+    startCommand: pnpm --filter @productpath/api start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: API_URL
+        sync: false
+      - key: WEB_APP_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ADMIN_APP_URL
+        sync: false

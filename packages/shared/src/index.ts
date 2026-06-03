@@ -7,4 +7,5 @@ export * from "./schemas/project";
 export * from "./schemas/marketplace";
 export * from "./schemas/community";
 export * from "./constants";
+export * from "./email";
 export * from "./sanitize";

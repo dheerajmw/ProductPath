@@ -1,6 +1,6 @@
 # ProductPath
 
-Skill-first talent network for product professionals. See [docs/problemStatenment.md](./docs/problemStatenment.md) and [docs/implementationPlan.md](./docs/implementationPlan.md).
+Skill-first talent network for product professionals. See [docs/FEATURES.md](./docs/FEATURES.md) (capabilities overview), [docs/problemStatenment.md](./docs/problemStatenment.md), and [docs/implementationPlan.md](./docs/implementationPlan.md).
 
 ## Phase 5 (Verification) — implemented
 
@@ -96,6 +96,17 @@ After signup, open the API terminal log for:
 ```text
 [dev] Email verification link for you@example.com: http://localhost:3000/verify-email?token=...
 ```
+
+## Deploy frontend (Vercel)
+
+Hosts **`apps/web`** — same UI as http://localhost:3000.
+
+1. [vercel.com](https://vercel.com) → Import **ProductPath** from GitHub.
+2. **Root Directory:** `apps/web`
+3. Enable **Include source files outside of the Root Directory**
+4. Env: `NEXT_PUBLIC_API_URL` → your public API URL
+
+Details: [docs/vercel-deploy.md](./docs/vercel-deploy.md). Database: [docs/vercel-postgres.md](./docs/vercel-postgres.md). **Signup on Vercel:** [docs/vercel-production.md](./docs/vercel-production.md).
 
 ## Streamlit portal (Community Cloud)
 

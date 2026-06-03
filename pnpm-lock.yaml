@@ -124,6 +124,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@productpath/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@productpath/ui':
         specifier: workspace:*
         version: link:../../packages/ui

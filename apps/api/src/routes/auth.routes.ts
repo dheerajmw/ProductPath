@@ -5,8 +5,8 @@ import {
   signupSchema,
   verifyEmailSchema,
   SESSION_COOKIE,
-  SESSION_DAYS,
 } from "@productpath/shared";
+import { setSessionCookie, clearSessionCookie } from "../lib/session-cookie";
 import { z } from "zod";
 import {
   login,
@@ -21,21 +21,6 @@ import { requireAuth, type AuthedRequest } from "../middleware/auth";
 import { shouldExposeDevVerifyUrl } from "../lib/email";
 
 const router = Router();
-
-function setSessionCookie(res: import("express").Response, token: string) {
-  const isProd = process.env.NODE_ENV === "production";
-  res.cookie(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: "lax",
-    maxAge: SESSION_DAYS * 24 * 60 * 60 * 1000,
-    path: "/",
-  });
-}
-
-function clearSessionCookie(res: import("express").Response) {
-  res.clearCookie(SESSION_COOKIE, { path: "/" });
-}
 
 function withDevVerifyUrl<T extends { verifyUrl?: string }>(payload: T) {
   const { verifyUrl, ...rest } = payload;

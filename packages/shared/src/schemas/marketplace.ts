@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const recruiterSignupSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.string().email().max(255).toLowerCase().trim(),
   password: z.string().min(8).max(128),
   company: z.string().min(1).max(200),
   companyDomain: z.string().min(3).max(200).optional(),

@@ -2,7 +2,7 @@
 
 This document describes how ProductPath is built in phases—from learning foundations through verification and marketplace—aligned with the [problem statement](./problemStatenment.md).
 
-For build tasks and exit criteria, see the [implementation plan](./implementationPlan.md).
+For build tasks and exit criteria, see the [implementation plan](./implementationPlan.md). For a feature overview by role, see [FEATURES.md](./FEATURES.md).
 
 ---
 

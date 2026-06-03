@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, Label, Alert } from "@productpath/ui";
+import { normalizeEmail } from "@productpath/shared";
 import { api, ApiError, type User } from "@/lib/api";
 import { getPostLoginPath } from "@/lib/auth-redirect";
 import { invalidateMeCache } from "@/lib/me-cache";
@@ -30,13 +31,14 @@ export function AuthForm({
     setError(null);
     setLoading(true);
     try {
+      const normalizedEmail = normalizeEmail(email);
       const result = await onSubmit({
-        email,
+        email: normalizedEmail,
         password,
-        ...(mode === "signup" ? { displayName: displayName || undefined } : {}),
+        ...(mode === "signup" ? { displayName: displayName.trim() || undefined } : {}),
       });
       if (mode === "signup") {
-        const params = new URLSearchParams({ email });
+        const params = new URLSearchParams({ email: normalizedEmail });
         if (result?.devVerifyUrl) {
           params.set("devVerifyUrl", result.devVerifyUrl);
         }
@@ -50,7 +52,13 @@ export function AuthForm({
         router.push(getPostLoginPath(user));
       }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong");
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Something went wrong";
+      setError(message);
     } finally {
       setLoading(false);
     }
