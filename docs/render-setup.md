@@ -36,17 +36,9 @@ Render runs `pnpm install --frozen-lockfile`. If the lockfile is out of date wit
 
 **Fix for maintainers:** run `pnpm install` locally, commit `pnpm-lock.yaml`, push to `main`, redeploy.
 
-**Build command** (must match `render.yaml`):
+**Build command** (repo root): `bash scripts/render-build.sh`
 
-```bash
-npm install -g corepack@latest
-corepack enable
-corepack prepare pnpm@9.15.0 --activate
-pnpm install --frozen-lockfile
-pnpm db:generate
-pnpm db:migrate:deploy
-pnpm --filter @productpath/api build
-```
+Requires **`DATABASE_URL`** in Render env to run migrations during build (optional if DB already migrated locally).
 
 ---
 
@@ -67,16 +59,15 @@ If Blueprint keeps failing:
 | **Start Command** | `pnpm --filter @productpath/api start` |
 | **Health Check Path** | `/health` |
 
-**Build Command** (paste as one block):
+**Build Command:**
 
 ```bash
-npm install -g corepack@latest
-corepack enable
-pnpm install --frozen-lockfile
-pnpm db:generate
-pnpm db:migrate:deploy
-pnpm --filter @productpath/api build
+bash scripts/render-build.sh
 ```
+
+Or paste the full script from `scripts/render-build.sh` in the repo.
+
+**Important:** Add **`DATABASE_URL`** in Environment **before** the first deploy so migrations run during build. If you already migrated from your laptop (`pnpm db:migrate:deploy` with Neon), the build can still succeed without it (migrations are skipped).
 
 4. **Environment** variables:
 

@@ -11,14 +11,7 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: |
-      npm install -g corepack@latest
-      corepack enable
-      corepack prepare pnpm@9.15.0 --activate
-      pnpm install --frozen-lockfile
-      pnpm db:generate
-      pnpm db:migrate:deploy
-      pnpm --filter @productpath/api build
+    buildCommand: bash scripts/render-build.sh
     startCommand: pnpm --filter @productpath/api start
     healthCheckPath: /health
     envVars:
