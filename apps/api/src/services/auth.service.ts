@@ -36,7 +36,7 @@ export function toPublicUser(user: {
     activeRole?: { id: string; slug: string; name: string; description: string | null } | null;
   } | null;
   recruiterProfile?: {
-    company: string;
+    company: string | null;
     companyDomain: string | null;
     verified: boolean;
   } | null;
@@ -54,7 +54,13 @@ export function toPublicUser(user: {
           activeRole: user.candidateProfile.activeRole ?? null,
         }
       : null,
-    recruiterProfile: user.recruiterProfile ?? null,
+    recruiterProfile: user.recruiterProfile
+      ? {
+          company: user.recruiterProfile.company,
+          companyDomain: user.recruiterProfile.companyDomain,
+          verified: user.recruiterProfile.verified,
+        }
+      : null,
   };
 }
 
