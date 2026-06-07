@@ -1,5 +1,6 @@
 import { api, type User } from "@/lib/api";
 import { authDebug } from "@/lib/auth-debug";
+import { isValidUser, toAuthDebugUser } from "@/lib/auth-user";
 
 const ME_CACHE_MS = 30_000;
 
@@ -15,12 +16,13 @@ export function getCachedUser(): User | null {
 
 /** Seed cache after login — cancels stale in-flight /auth/me from app boot. */
 export function seedMeCache(user: User) {
+  if (!isValidUser(user)) return;
   generation += 1;
   cached = { user, fetchedAt: Date.now() };
   inflight = null;
   authDebug({
     event: "me-cache:seed",
-    user: { id: user.id, email: user.email },
+    user: toAuthDebugUser(user),
     isAuthenticated: true,
   });
 }
@@ -34,6 +36,9 @@ export function invalidateMeCache() {
 /** Network call to /auth/me — bypasses cache (use after login to verify session). */
 export async function fetchMeFresh(sessionToken?: string | null): Promise<User> {
   const { user } = await api.me(sessionToken);
+  if (!isValidUser(user)) {
+    throw new Error("Session verification returned invalid user data");
+  }
   cached = { user, fetchedAt: Date.now() };
   inflight = null;
   return user;
@@ -49,6 +54,9 @@ export async function fetchMeCached(): Promise<User> {
     inflight = api
       .me()
       .then(({ user }) => {
+        if (!isValidUser(user)) {
+          throw new Error("Invalid user in /auth/me response");
+        }
         if (gen !== generation) {
           return getCachedUser() ?? user;
         }

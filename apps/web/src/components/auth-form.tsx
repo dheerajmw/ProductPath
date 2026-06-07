@@ -10,6 +10,7 @@ import { authDebug } from "@/lib/auth-debug";
 import { useAuth } from "@/lib/auth-context";
 import { getPostLoginPath } from "@/lib/auth-redirect";
 import { getStoredSessionToken } from "@/lib/session-token";
+import { isValidUser, toAuthDebugUser } from "@/lib/auth-user";
 
 export function AuthForm({
   mode,
@@ -48,12 +49,21 @@ export function AuthForm({
         }
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
-        authDebug({ event: "login:submit-ok", user: { id: result.user.id, email: result.user.email } });
+        if (!isValidUser(result.user)) {
+          throw new Error("Login response was missing user data. Please try again.");
+        }
+        authDebug({ event: "login:submit-ok", user: toAuthDebugUser(result.user) });
         const user = await establishSession(result.user, result.sessionToken);
+        if (!isValidUser(user)) {
+          throw new Error("Session could not be established. Please try again.");
+        }
         authDebug({ event: "login:redirect", detail: getPostLoginPath(user) });
         router.replace(getPostLoginPath(user));
       } else {
         const { user: meUser } = await api.me();
+        if (!isValidUser(meUser)) {
+          throw new Error("Could not load your profile after login.");
+        }
         const user = await establishSession(meUser, getStoredSessionToken());
         router.replace(getPostLoginPath(user));
       }

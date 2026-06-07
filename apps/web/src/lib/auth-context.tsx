@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { api, ApiError, type User } from "@/lib/api";
 import { authDebug } from "@/lib/auth-debug";
 import { setStoredSessionToken, getStoredSessionToken } from "@/lib/session-token";
+import { isValidUser, toAuthDebugUser } from "@/lib/auth-user";
 import {
   fetchMeCached,
   fetchMeFresh,
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (event: string, extra?: Record<string, unknown>) => {
       authDebug({
         event,
-        user: user ? { id: user.id, email: user.email } : null,
+        user: toAuthDebugUser(user),
         loading: status === "loading",
         isAuthenticated: status === "authenticated",
         pathname,
@@ -63,6 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logState("refresh:start");
     try {
       const me = await fetchMeCached();
+      if (!isValidUser(me)) {
+        throw new Error("Invalid user in session response");
+      }
       if (gen !== authGeneration.current) {
         logState("refresh:stale-skipped", { gen, current: authGeneration.current });
         return getCachedUser();
@@ -105,6 +109,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const establishSession = useCallback(
     async (known: User, sessionToken?: string | null) => {
+      if (!isValidUser(known)) {
+        throw new Error("Login response was missing user data. Please try again.");
+      }
+
       authGeneration.current += 1;
       const gen = authGeneration.current;
       logState("establishSession:start", {
@@ -116,16 +124,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         seedMeCache(known);
-        const verified = await fetchMeFresh(sessionToken);
+        let verified: User | null = null;
+        try {
+          verified = await fetchMeFresh(sessionToken);
+        } catch (err) {
+          if (err instanceof ApiError && err.status === 401) throw err;
+        }
+
+        const sessionUser = isValidUser(verified) ? verified : known;
         if (gen !== authGeneration.current) {
           logState("establishSession:stale");
-          return getCachedUser() ?? verified;
+          return getCachedUser() ?? sessionUser;
         }
-        seedMeCache(verified);
-        setUser(verified);
+        seedMeCache(sessionUser);
+        setUser(sessionUser);
         setStatus("authenticated");
-        logState("establishSession:verified", { userId: verified.id });
-        return verified;
+        logState("establishSession:verified", { userId: sessionUser.id });
+        return sessionUser;
       } catch (err) {
         invalidateMeCache();
         setStoredSessionToken(null);
