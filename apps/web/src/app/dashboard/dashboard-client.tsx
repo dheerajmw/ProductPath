@@ -11,7 +11,8 @@ import {
 } from "@productpath/ui";
 import { api, ApiError, type SkillDevelopmentResponse, type VerificationResponse } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
-import { AuthLoadingScreen, useRequireAuth } from "@/hooks/use-require-auth";
+import { AuthLoadingScreen } from "@/components/auth-guard";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 
 function ProgressRing({ percent }: { percent: number }) {
   const r = 45;

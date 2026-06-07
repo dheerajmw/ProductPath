@@ -7,7 +7,8 @@ import { api, ApiError, type ProductRole } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
 import { ProductPathBrand } from "@/components/productpath-brand";
 import { RolePicker } from "@/components/role-picker";
-import { AuthLoadingScreen, useRequireAuth } from "@/hooks/use-require-auth";
+import { AuthLoadingScreen } from "@/components/auth-guard";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/lib/auth-context";
 
 export default function RoleOnboardingPage() {
