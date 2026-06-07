@@ -9,8 +9,9 @@ import {
   Spinner,
   VerificationBadge,
 } from "@productpath/ui";
-import { api, type User, ApiError, type SkillDevelopmentResponse, type VerificationResponse } from "@/lib/api";
+import { api, ApiError, type SkillDevelopmentResponse, type VerificationResponse } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
+import { AuthLoadingScreen, useRequireAuth } from "@/hooks/use-require-auth";
 
 function ProgressRing({ percent }: { percent: number }) {
   const r = 45;
@@ -52,40 +53,46 @@ function ProgressRing({ percent }: { percent: number }) {
 
 export function DashboardClient() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading: authLoading } = useRequireAuth({
+    redirectTo: "/login?role=candidate",
+  });
   const [skillDev, setSkillDev] = useState<SkillDevelopmentResponse | null>(null);
   const [verification, setVerification] = useState<VerificationResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api
-      .me()
-      .then((me) => {
-        setUser(me.user);
-        const roleId = me.user.candidateProfile?.activeRoleId;
-        if (!roleId) {
-          router.replace("/onboarding/role");
-          return;
-        }
-        return Promise.all([
-          api.getSkillDevelopment().then(setSkillDev).catch(() => null),
-          api.getVerification().then(setVerification).catch(() => null),
-        ]);
-      })
+    if (authLoading || !user) return;
+
+    const roleId = user.candidateProfile?.activeRoleId;
+    if (!roleId) {
+      router.replace("/onboarding/role");
+      return;
+    }
+
+    setDataLoading(true);
+    setError(null);
+    Promise.all([
+      api.getSkillDevelopment().then(setSkillDev).catch(() => null),
+      api.getVerification().then(setVerification).catch(() => null),
+    ])
       .catch((err) => {
-        if (err instanceof ApiError && err.status === 401) {
-          router.replace("/login?role=candidate");
-          return;
-        }
         setError(err instanceof ApiError ? err.message : "Failed to load dashboard");
       })
-      .finally(() => setLoading(false));
-  }, [router]);
+      .finally(() => setDataLoading(false));
+  }, [authLoading, user, router]);
 
   const displayName = user?.candidateProfile?.displayName ?? user?.email.split("@")[0] ?? "Member";
 
-  if (loading) {
+  if (authLoading || !user) {
+    return (
+      <CandidateAppShell title="Command Center">
+        <AuthLoadingScreen label="Checking session…" />
+      </CandidateAppShell>
+    );
+  }
+
+  if (dataLoading) {
     return (
       <CandidateAppShell title="Command Center">
         <div style={{ display: "flex", justifyContent: "center", padding: 48 }}>

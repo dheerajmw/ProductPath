@@ -6,8 +6,8 @@ import { Button, Input, Label, Alert } from "@productpath/ui";
 import { normalizeEmail } from "@productpath/shared";
 import { api, type User } from "@/lib/api";
 import { formatApiErrorMessage } from "@/lib/api-errors";
+import { useAuth } from "@/lib/auth-context";
 import { getPostLoginPath } from "@/lib/auth-redirect";
-import { invalidateMeCache } from "@/lib/me-cache";
 
 export function AuthForm({
   mode,
@@ -21,6 +21,7 @@ export function AuthForm({
   }) => Promise<{ devVerifyUrl?: string; user?: User } | void>;
 }) {
   const router = useRouter();
+  const { establishSession } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -45,11 +46,11 @@ export function AuthForm({
         }
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
-        invalidateMeCache();
+        establishSession(result.user);
         router.replace(getPostLoginPath(result.user));
       } else {
         const { user } = await api.me();
-        invalidateMeCache();
+        establishSession(user);
         router.replace(getPostLoginPath(user));
       }
     } catch (err) {

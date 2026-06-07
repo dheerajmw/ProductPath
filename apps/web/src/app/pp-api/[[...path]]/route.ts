@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRemoteApiUrl, normalizeSetCookie } from "@/lib/api-proxy";
+import { SESSION_COOKIE } from "@productpath/shared";
+import {
+  extractSessionToken,
+  getRemoteApiUrl,
+  readSetCookieHeaders,
+  sessionCookieOptions,
+} from "@/lib/api-proxy";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -17,7 +23,7 @@ const HOP_BY_HOP = new Set([
 
 async function proxy(req: NextRequest, path: string[] | undefined) {
   const segments = path ?? [];
-  const upstream = `${getRemoteApiUrl()}/${segments.join("/")}${req.nextUrl.search}`;
+  const upstreamUrl = `${getRemoteApiUrl()}/${segments.join("/")}${req.nextUrl.search}`;
 
   const headers = new Headers();
   const cookie = req.headers.get("cookie");
@@ -39,24 +45,28 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
     init.body = await req.arrayBuffer();
   }
 
-  const res = await fetch(upstream, init);
+  const upstream = await fetch(upstreamUrl, init);
   const outHeaders = new Headers();
 
-  res.headers.forEach((value, key) => {
+  upstream.headers.forEach((value, key) => {
     const lower = key.toLowerCase();
-    if (HOP_BY_HOP.has(lower)) return;
-    if (lower === "set-cookie") {
-      outHeaders.append("set-cookie", normalizeSetCookie(value));
-      return;
-    }
+    if (HOP_BY_HOP.has(lower) || lower === "set-cookie") return;
     outHeaders.set(key, value);
   });
 
-  return new NextResponse(res.body, {
-    status: res.status,
-    statusText: res.statusText,
+  const response = new NextResponse(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
     headers: outHeaders,
   });
+
+  const setCookies = readSetCookieHeaders(upstream.headers);
+  const sessionToken = extractSessionToken(setCookies);
+  if (sessionToken) {
+    response.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions);
+  }
+
+  return response;
 }
 
 type RouteCtx = { params: Promise<{ path?: string[] }> };

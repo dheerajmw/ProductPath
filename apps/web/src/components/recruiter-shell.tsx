@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AppShell, Button } from "@productpath/ui";
-import { api } from "@/lib/api";
-import { invalidateMeCache } from "@/lib/me-cache";
+import { useAuth } from "@/lib/auth-context";
 import { ProductPathBrand } from "@/components/productpath-brand";
 import { RecruiterSidebarProfile } from "@/components/sidebar-profile";
 import type { ReactNode } from "react";
@@ -34,6 +33,7 @@ export function RecruiterShell({
   children: ReactNode;
 }) {
   const router = useRouter();
+  const { logout } = useAuth();
 
   return (
     <AppShell
@@ -49,8 +49,7 @@ export function RecruiterShell({
           variant="ghost"
           size="sm"
           onClick={async () => {
-            await api.logout();
-            invalidateMeCache();
+            await logout();
             router.push("/");
           }}
         >

@@ -7,39 +7,47 @@ import { api, ApiError, type ProductRole } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
 import { ProductPathBrand } from "@/components/productpath-brand";
 import { RolePicker } from "@/components/role-picker";
+import { AuthLoadingScreen, useRequireAuth } from "@/hooks/use-require-auth";
+import { useAuth } from "@/lib/auth-context";
 
 export default function RoleOnboardingPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useRequireAuth({
+    redirectTo: "/login?role=candidate",
+  });
+  const { refresh } = useAuth();
   const [roles, setRoles] = useState<ProductRole[]>([]);
   const [activeRoleId, setActiveRoleId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmRoleId, setConfirmRoleId] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([api.me(), api.roles()])
-      .then(([me, { roles: r }]) => {
-        const roleId = me.user.candidateProfile?.activeRoleId ?? null;
-        if (roleId) {
-          router.replace("/dashboard");
-          return;
-        }
-        setRoles(r);
-        setActiveRoleId(roleId);
-      })
+    if (authLoading || !user) return;
+
+    const roleId = user.candidateProfile?.activeRoleId ?? null;
+    if (roleId) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    setActiveRoleId(roleId);
+    api
+      .roles()
+      .then(({ roles: r }) => setRoles(r))
       .catch((err) => {
-        if (err instanceof ApiError && err.status === 401) router.push("/login");
-        else setError(err instanceof ApiError ? err.message : "Failed to load");
+        setError(err instanceof ApiError ? err.message : "Failed to load");
       })
-      .finally(() => setLoading(false));
-  }, [router]);
+      .finally(() => setPageLoading(false));
+  }, [authLoading, user, router]);
 
   async function selectRole(roleId: string, confirmArchive = false) {
     setSubmitting(roleId);
     setError(null);
     try {
       await api.selectRole(roleId, confirmArchive);
+      await refresh();
       router.push("/projects");
     } catch (err) {
       if (err instanceof ApiError && err.code === "ROLE_SWITCH_REQUIRES_CONFIRM") {
@@ -60,7 +68,7 @@ export default function RoleOnboardingPage() {
     void selectRole(roleId);
   }
 
-  if (loading) {
+  if (authLoading || pageLoading) {
     return (
       <CandidateAppShell title="Get started">
         <div className="pp-onboarding-loading">

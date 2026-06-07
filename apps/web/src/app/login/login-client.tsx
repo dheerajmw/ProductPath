@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
+import { getPostLoginPath } from "@/lib/auth-redirect";
 
 export type LoginRole = "candidate" | "recruiter";
 
@@ -14,13 +16,24 @@ function roleFromParam(value: string | null): LoginRole | null {
 }
 
 export function LoginClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
   const initialRole = roleFromParam(searchParams.get("role"));
   const [role, setRole] = useState<LoginRole | null>(initialRole);
+
+  useEffect(() => {
+    if (authLoading || !user) return;
+    router.replace(getPostLoginPath(user));
+  }, [authLoading, user, router]);
 
   const selectRole = useCallback((next: LoginRole) => {
     setRole(next);
   }, []);
+
+  if (authLoading) {
+    return null;
+  }
 
   if (!role) {
     return (
