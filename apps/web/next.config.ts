@@ -6,9 +6,7 @@ import type { NextConfig } from "next";
 loadEnvConfig(path.join(__dirname, "../.."));
 
 const remoteApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:4000";
-const useApiProxy =
-  process.env.NODE_ENV === "production" &&
-  !/localhost|127\.0\.0\.1/.test(remoteApiUrl);
+const useApiProxy = !/localhost|127\.0\.0\.1/.test(remoteApiUrl);
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@productpath/ui"],

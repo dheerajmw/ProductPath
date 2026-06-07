@@ -9,12 +9,12 @@ function isLocalApi(url: string): boolean {
 }
 
 /**
- * Browser production calls use same-origin `/pp-api/*` (Next.js rewrite → Render).
- * That lets session cookies stay first-party on the Vercel domain.
- * Local dev still talks to localhost:4000 directly.
+ * Browser calls use same-origin `/pp-api/*` (Next.js rewrite → Render) whenever the
+ * API is not localhost. Session cookies stay first-party on the Vercel domain.
+ * Server-side code uses REMOTE_API_URL directly.
  */
 export function getApiBaseUrl(): string {
-  if (typeof window !== "undefined" && process.env.NODE_ENV === "production" && !isLocalApi(REMOTE_API_URL)) {
+  if (typeof window !== "undefined" && !isLocalApi(REMOTE_API_URL)) {
     return PROXY_PREFIX;
   }
   return REMOTE_API_URL;
