@@ -1,33 +1,45 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Spinner } from "@productpath/ui";
 import { useAuth } from "@/lib/auth-context";
+import { authDebug } from "@/lib/auth-debug";
+import { navigateToLogin } from "@/lib/auth-nav";
 
 type Options = {
   redirectTo?: string;
-  /** When true, wait for loading before redirecting unauthenticated users. */
   requireAuth?: boolean;
+  loginSource?: string;
 };
 
-/**
- * Waits for auth initialization before redirecting.
- * Returns { user, loading, ready } — `ready` is false while auth is still loading.
- */
 export function useRequireAuth(options: Options = {}) {
-  const { redirectTo = "/login", requireAuth = true } = options;
+  const {
+    requireAuth = true,
+    loginSource = "useRequireAuth",
+  } = options;
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const pathname = usePathname();
+  const { user, loading, status } = useAuth();
 
   useEffect(() => {
     if (!requireAuth || loading) return;
-    if (!user) router.replace(redirectTo);
-  }, [requireAuth, loading, user, router, redirectTo]);
+    if (!user) {
+      authDebug({
+        event: "guard:redirect-login",
+        loading,
+        isAuthenticated: false,
+        pathname,
+        detail: loginSource,
+      });
+      navigateToLogin(router, loginSource);
+    }
+  }, [requireAuth, loading, user, router, pathname, loginSource]);
 
   return {
     user,
     loading,
+    status,
     ready: !loading,
     authenticated: Boolean(user),
   };
@@ -54,17 +66,17 @@ export function AuthLoadingScreen({ label = "Loading…" }: { label?: string }) 
 
 export function RequireAuth({
   children,
-  redirectTo = "/login",
+  loginSource = "RequireAuth",
   fallback,
 }: {
   children: ReactNode;
-  redirectTo?: string;
+  loginSource?: string;
   fallback?: ReactNode;
 }) {
-  const { user, loading, ready } = useRequireAuth({ redirectTo });
+  const { user, loading, ready } = useRequireAuth({ loginSource });
 
   if (loading || !ready) {
-    return fallback ?? <AuthLoadingScreen />;
+    return fallback ?? <AuthLoadingScreen label="Checking session…" />;
   }
 
   if (!user) return null;

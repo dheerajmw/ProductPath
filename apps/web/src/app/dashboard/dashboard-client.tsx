@@ -54,7 +54,7 @@ function ProgressRing({ percent }: { percent: number }) {
 export function DashboardClient() {
   const router = useRouter();
   const { user, loading: authLoading } = useRequireAuth({
-    redirectTo: "/login?role=candidate",
+    loginSource: "dashboard",
   });
   const [skillDev, setSkillDev] = useState<SkillDevelopmentResponse | null>(null);
   const [verification, setVerification] = useState<VerificationResponse | null>(null);

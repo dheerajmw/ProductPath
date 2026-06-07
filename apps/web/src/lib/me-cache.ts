@@ -1,4 +1,5 @@
 import { api, type User } from "@/lib/api";
+import { authDebug } from "@/lib/auth-debug";
 
 const ME_CACHE_MS = 30_000;
 
@@ -12,11 +13,18 @@ export function getCachedUser(): User | null {
   return cached.user;
 }
 
+import { authDebug } from "@/lib/auth-debug";
+
 /** Seed cache after login — cancels stale in-flight /auth/me from app boot. */
 export function seedMeCache(user: User) {
   generation += 1;
   cached = { user, fetchedAt: Date.now() };
   inflight = null;
+  authDebug({
+    event: "me-cache:seed",
+    user: { id: user.id, email: user.email },
+    isAuthenticated: true,
+  });
 }
 
 export function invalidateMeCache() {

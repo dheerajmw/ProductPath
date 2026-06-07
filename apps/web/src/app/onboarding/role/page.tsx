@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth-context";
 export default function RoleOnboardingPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useRequireAuth({
-    redirectTo: "/login?role=candidate",
+    loginSource: "onboarding/role",
   });
   const { refresh } = useAuth();
   const [roles, setRoles] = useState<ProductRole[]>([]);

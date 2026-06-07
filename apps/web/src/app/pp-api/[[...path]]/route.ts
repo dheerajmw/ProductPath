@@ -64,7 +64,7 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   const setCookies = readSetCookieHeaders(upstream.headers);
   const sessionToken = extractSessionToken(setCookies);
   if (sessionToken) {
-    response.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions);
+    response.cookies.set(SESSION_COOKIE, decodeURIComponent(sessionToken), sessionCookieOptions);
   } else if (req.method === "POST" && segments[0] === "auth" && segments[1] === "logout") {
     response.cookies.set(SESSION_COOKIE, "", { ...sessionCookieOptions, maxAge: 0 });
   }

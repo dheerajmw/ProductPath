@@ -6,6 +6,7 @@ import { Button, Input, Label, Alert } from "@productpath/ui";
 import { normalizeEmail } from "@productpath/shared";
 import { api, type User } from "@/lib/api";
 import { formatApiErrorMessage } from "@/lib/api-errors";
+import { authDebug } from "@/lib/auth-debug";
 import { useAuth } from "@/lib/auth-context";
 import { getPostLoginPath } from "@/lib/auth-redirect";
 
@@ -46,7 +47,9 @@ export function AuthForm({
         }
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
+        authDebug({ event: "login:submit-ok", user: { id: result.user.id, email: result.user.email } });
         const user = await establishSession(result.user);
+        authDebug({ event: "login:redirect", detail: getPostLoginPath(user) });
         router.replace(getPostLoginPath(user));
       } else {
         const { user: meUser } = await api.me();

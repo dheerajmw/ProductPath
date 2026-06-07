@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
@@ -21,10 +21,15 @@ export function LoginClient() {
   const { user, loading: authLoading } = useAuth();
   const initialRole = roleFromParam(searchParams.get("role"));
   const [role, setRole] = useState<LoginRole | null>(initialRole);
+  const initialAuthCheckDone = useRef(false);
 
+  // Only redirect already-authenticated visitors — NOT mid-login user state updates.
   useEffect(() => {
-    if (authLoading || !user) return;
-    router.replace(getPostLoginPath(user));
+    if (authLoading || initialAuthCheckDone.current) return;
+    initialAuthCheckDone.current = true;
+    if (user) {
+      router.replace(getPostLoginPath(user));
+    }
   }, [authLoading, user, router]);
 
   const selectRole = useCallback((next: LoginRole) => {

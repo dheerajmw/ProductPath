@@ -1,4 +1,5 @@
 import { getApiBaseUrl, REMOTE_API_URL } from "./api-url";
+import { authDebug } from "./auth-debug";
 
 export { getApiBaseUrl, REMOTE_API_URL as API_URL };
 
@@ -88,9 +89,10 @@ export async function checkApiReachable(): Promise<{
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const base = getApiBaseUrl();
   let res: Response;
   try {
-    res = await fetch(`${getApiBaseUrl()}${path}`, {
+    res = await fetch(`${base}${path}`, {
       ...init,
       credentials: "include",
       headers: {
@@ -103,6 +105,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   const data = await parseJsonResponse(res);
+
+  if (path === "/auth/me" || path === "/auth/login") {
+    authDebug({
+      event: `api:${path}`,
+      detail: `status=${res.status} base=${base}`,
+      isAuthenticated: res.ok,
+    });
+  }
 
   if (!res.ok) {
     throw createHttpError(res, data);
