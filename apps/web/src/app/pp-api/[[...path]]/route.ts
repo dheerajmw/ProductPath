@@ -8,6 +8,7 @@ import {
 } from "@/lib/api-proxy";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const HOP_BY_HOP = new Set([
@@ -64,6 +65,8 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   const sessionToken = extractSessionToken(setCookies);
   if (sessionToken) {
     response.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions);
+  } else if (req.method === "POST" && segments[0] === "auth" && segments[1] === "logout") {
+    response.cookies.set(SESSION_COOKIE, "", { ...sessionCookieOptions, maxAge: 0 });
   }
 
   return response;

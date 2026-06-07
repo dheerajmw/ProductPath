@@ -24,11 +24,11 @@ export function VerifyEmailClient() {
 
     api
       .verifyEmail(token)
-      .then(({ user }) => {
-        establishSession(user);
+      .then(async ({ user }) => {
+        const verified = await establishSession(user);
         setStatus("success");
         setMessage("Email verified. Redirecting…");
-        setTimeout(() => router.replace(getPostLoginPath(user)), 1500);
+        setTimeout(() => router.replace(getPostLoginPath(verified)), 1500);
       })
       .catch((err) => {
         setStatus("error");

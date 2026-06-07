@@ -4,23 +4,48 @@ const ME_CACHE_MS = 30_000;
 
 let cached: { user: User; fetchedAt: number } | null = null;
 let inflight: Promise<User> | null = null;
+let generation = 0;
 
-/** Seed cache after login so the next page does not 401 before cookie round-trip. */
+export function getCachedUser(): User | null {
+  if (!cached) return null;
+  if (Date.now() - cached.fetchedAt >= ME_CACHE_MS) return null;
+  return cached.user;
+}
+
+/** Seed cache after login — cancels stale in-flight /auth/me from app boot. */
 export function seedMeCache(user: User) {
+  generation += 1;
   cached = { user, fetchedAt: Date.now() };
   inflight = null;
 }
 
+export function invalidateMeCache() {
+  generation += 1;
+  cached = null;
+  inflight = null;
+}
+
+/** Network call to /auth/me — bypasses cache (use after login to verify cookie). */
+export async function fetchMeFresh(): Promise<User> {
+  const { user } = await api.me();
+  cached = { user, fetchedAt: Date.now() };
+  inflight = null;
+  return user;
+}
+
 /** Dedupe `/auth/me` across sidebar + page loads within a short window. */
 export async function fetchMeCached(): Promise<User> {
-  if (cached && Date.now() - cached.fetchedAt < ME_CACHE_MS) {
-    return cached.user;
-  }
+  const hit = getCachedUser();
+  if (hit) return hit;
 
   if (!inflight) {
+    const gen = generation;
     inflight = api
       .me()
       .then(({ user }) => {
+        if (gen !== generation) {
+          return getCachedUser() ?? user;
+        }
         cached = { user, fetchedAt: Date.now() };
         return user;
       })
@@ -29,10 +54,11 @@ export async function fetchMeCached(): Promise<User> {
       });
   }
 
-  return inflight;
-}
-
-export function invalidateMeCache() {
-  cached = null;
-  inflight = null;
+  try {
+    return await inflight;
+  } catch (err) {
+    const fallback = getCachedUser();
+    if (fallback) return fallback;
+    throw err;
+  }
 }

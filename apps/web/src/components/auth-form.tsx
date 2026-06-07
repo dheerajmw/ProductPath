@@ -46,11 +46,11 @@ export function AuthForm({
         }
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
-        establishSession(result.user);
-        router.replace(getPostLoginPath(result.user));
+        const user = await establishSession(result.user);
+        router.replace(getPostLoginPath(user));
       } else {
-        const { user } = await api.me();
-        establishSession(user);
+        const { user: meUser } = await api.me();
+        const user = await establishSession(meUser);
         router.replace(getPostLoginPath(user));
       }
     } catch (err) {
