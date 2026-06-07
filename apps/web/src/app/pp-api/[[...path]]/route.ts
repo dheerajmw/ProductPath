@@ -1,0 +1,92 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getRemoteApiUrl, normalizeSetCookie } from "@/lib/api-proxy";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+const HOP_BY_HOP = new Set([
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailers",
+  "transfer-encoding",
+  "upgrade",
+]);
+
+async function proxy(req: NextRequest, path: string[] | undefined) {
+  const segments = path ?? [];
+  const upstream = `${getRemoteApiUrl()}/${segments.join("/")}${req.nextUrl.search}`;
+
+  const headers = new Headers();
+  const cookie = req.headers.get("cookie");
+  if (cookie) headers.set("cookie", cookie);
+
+  const contentType = req.headers.get("content-type");
+  if (contentType) headers.set("content-type", contentType);
+
+  const accept = req.headers.get("accept");
+  if (accept) headers.set("accept", accept);
+
+  const init: RequestInit = {
+    method: req.method,
+    headers,
+    cache: "no-store",
+  };
+
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    init.body = await req.arrayBuffer();
+  }
+
+  const res = await fetch(upstream, init);
+  const outHeaders = new Headers();
+
+  res.headers.forEach((value, key) => {
+    const lower = key.toLowerCase();
+    if (HOP_BY_HOP.has(lower)) return;
+    if (lower === "set-cookie") {
+      outHeaders.append("set-cookie", normalizeSetCookie(value));
+      return;
+    }
+    outHeaders.set(key, value);
+  });
+
+  return new NextResponse(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers: outHeaders,
+  });
+}
+
+type RouteCtx = { params: Promise<{ path?: string[] }> };
+
+export async function GET(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
+
+export async function POST(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
+
+export async function PUT(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
+
+export async function PATCH(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
+
+export async function DELETE(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
+
+export async function OPTIONS(req: NextRequest, ctx: RouteCtx) {
+  const { path } = await ctx.params;
+  return proxy(req, path);
+}
