@@ -46,11 +46,11 @@ export function AuthForm({
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
         invalidateMeCache();
-        router.push(getPostLoginPath(result.user));
+        router.replace(getPostLoginPath(result.user));
       } else {
         const { user } = await api.me();
         invalidateMeCache();
-        router.push(getPostLoginPath(user));
+        router.replace(getPostLoginPath(user));
       }
     } catch (err) {
       setError(formatApiErrorMessage(err));

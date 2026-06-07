@@ -30,6 +30,16 @@ export function toPublicUser(user: {
   platformRole: PlatformRole;
   emailVerifiedAt: Date | null;
   createdAt: Date;
+  candidateProfile?: {
+    displayName: string | null;
+    activeRoleId: string | null;
+    activeRole?: { id: string; slug: string; name: string; description: string | null } | null;
+  } | null;
+  recruiterProfile?: {
+    company: string;
+    companyDomain: string | null;
+    verified: boolean;
+  } | null;
 }) {
   return {
     id: user.id,
@@ -37,6 +47,14 @@ export function toPublicUser(user: {
     platformRole: user.platformRole,
     emailVerified: Boolean(user.emailVerifiedAt),
     createdAt: user.createdAt.toISOString(),
+    candidateProfile: user.candidateProfile
+      ? {
+          displayName: user.candidateProfile.displayName,
+          activeRoleId: user.candidateProfile.activeRoleId,
+          activeRole: user.candidateProfile.activeRole ?? null,
+        }
+      : null,
+    recruiterProfile: user.recruiterProfile ?? null,
   };
 }
 
@@ -117,6 +135,14 @@ export async function login(input: LoginInput, ipAddress?: string) {
 
   const session = await createSession(user.id);
 
+  const userWithProfile = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: {
+      candidateProfile: { include: { activeRole: true } },
+      recruiterProfile: true,
+    },
+  });
+
   await writeAudit({
     userId: user.id,
     action: "auth.login",
@@ -125,7 +151,7 @@ export async function login(input: LoginInput, ipAddress?: string) {
     ipAddress,
   });
 
-  return { user: toPublicUser(user), sessionToken: session.token };
+  return { user: toPublicUser(userWithProfile!), sessionToken: session.token };
 }
 
 export async function createSession(userId: string) {

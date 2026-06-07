@@ -20,8 +20,13 @@ export default function RoleOnboardingPage() {
   useEffect(() => {
     Promise.all([api.me(), api.roles()])
       .then(([me, { roles: r }]) => {
+        const roleId = me.user.candidateProfile?.activeRoleId ?? null;
+        if (roleId) {
+          router.replace("/dashboard");
+          return;
+        }
         setRoles(r);
-        setActiveRoleId(me.user.candidateProfile?.activeRoleId ?? null);
+        setActiveRoleId(roleId);
       })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 401) router.push("/login");
@@ -35,7 +40,7 @@ export default function RoleOnboardingPage() {
     setError(null);
     try {
       await api.selectRole(roleId, confirmArchive);
-      router.push("/learn");
+      router.push("/projects");
     } catch (err) {
       if (err instanceof ApiError && err.code === "ROLE_SWITCH_REQUIRES_CONFIRM") {
         setConfirmRoleId(roleId);
@@ -78,8 +83,8 @@ export default function RoleOnboardingPage() {
             Choose your <span className="pp-gradient-text">product role</span>
           </h2>
           <p className="pp-body-muted pp-onboarding-subtitle">
-            Your roadmap, assessments, and verification path are tailored to one active role at a
-            time. You can switch later from Settings.
+            Your project submissions, assessments, and verification path are tailored to one active
+            role at a time. Optional roadmaps are available if you want to learn before testing.
           </p>
         </header>
 
