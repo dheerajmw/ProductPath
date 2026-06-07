@@ -10,12 +10,6 @@ NODE_ENV=development pnpm install --frozen-lockfile
 
 pnpm run db:generate
 
-db_url="$(printf '%s' "${DATABASE_URL:-}" | tr -d '[:space:]')"
-if [ -n "$db_url" ] && [[ "$db_url" == postgresql://* || "$db_url" == postgres://* ]]; then
-  echo "Running database migrations..."
-  pnpm db:migrate:deploy
-else
-  echo "Skipping migrations: DATABASE_URL is not set or invalid (add Neon URL in Render Environment, then redeploy)."
-fi
-
+# Migrations run at service start (scripts/render-start.sh), not during build — avoids exit 1
+# when DATABASE_URL is unset during Blueprint deploy or when Neon blocks pooler during build.
 pnpm run build:api

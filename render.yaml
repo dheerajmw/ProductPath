@@ -12,7 +12,7 @@ services:
     region: oregon
     branch: main
     buildCommand: bash scripts/render-build.sh
-    startCommand: pnpm --filter @productpath/api start
+    startCommand: bash scripts/render-start.sh
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
