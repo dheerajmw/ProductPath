@@ -243,8 +243,31 @@ export async function resendVerification(email: string) {
   };
 }
 
-export async function getUserFromSession(sessionToken: string | undefined) {
-  if (!sessionToken) return null;
+export type SessionLookupResult =
+  | { status: "missing" }
+  | { status: "not_found" }
+  | { status: "expired" }
+  | { status: "ok"; user: Awaited<ReturnType<typeof fetchSessionUser>> };
+
+async function fetchSessionUser(sessionToken: string) {
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: {
+      user: {
+        include: {
+          candidateProfile: { include: { activeRole: true } },
+          recruiterProfile: true,
+        },
+      },
+    },
+  });
+  return session!.user;
+}
+
+export async function getUserFromSession(
+  sessionToken: string | undefined,
+): Promise<SessionLookupResult> {
+  if (!sessionToken) return { status: "missing" };
 
   const session = await prisma.session.findUnique({
     where: { token: sessionToken },
@@ -258,12 +281,12 @@ export async function getUserFromSession(sessionToken: string | undefined) {
     },
   });
 
-  if (!session || session.expiresAt < new Date()) {
-    if (session) {
-      await prisma.session.delete({ where: { id: session.id } });
-    }
-    return null;
+  if (!session) return { status: "not_found" };
+
+  if (session.expiresAt < new Date()) {
+    await prisma.session.delete({ where: { id: session.id } });
+    return { status: "expired" };
   }
 
-  return session.user;
+  return { status: "ok", user: session.user };
 }

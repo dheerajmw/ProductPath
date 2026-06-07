@@ -7,6 +7,7 @@ import {
 } from "@productpath/shared";
 import { setSessionCookie, clearSessionCookie } from "../lib/session-cookie";
 import { getSessionTokenFromRequest } from "../lib/session-token";
+import { logger } from "../lib/logger";
 import { z } from "zod";
 import {
   login,
@@ -45,6 +46,17 @@ router.post("/login", async (req, res, next) => {
     const input = loginSchema.parse(req.body);
     const result = await login(input, req.ip);
     setSessionCookie(res, result.sessionToken);
+    if (process.env.AUTH_DEBUG === "1") {
+      logger.info(
+        {
+          event: "auth:login:ok",
+          userId: result.user.id,
+          sessionTokenPrefix: result.sessionToken.slice(0, 8),
+          cookieSet: true,
+        },
+        "auth:debug",
+      );
+    }
     res.json({ user: result.user, sessionToken: result.sessionToken });
   } catch (e) {
     next(e);
