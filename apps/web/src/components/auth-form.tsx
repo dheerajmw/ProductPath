@@ -9,6 +9,7 @@ import { formatApiErrorMessage } from "@/lib/api-errors";
 import { authDebug } from "@/lib/auth-debug";
 import { useAuth } from "@/lib/auth-context";
 import { getPostLoginPath } from "@/lib/auth-redirect";
+import { getStoredSessionToken } from "@/lib/session-token";
 
 export function AuthForm({
   mode,
@@ -19,7 +20,7 @@ export function AuthForm({
     email: string;
     password: string;
     displayName?: string;
-  }) => Promise<{ devVerifyUrl?: string; user?: User } | void>;
+  }) => Promise<{ devVerifyUrl?: string; user?: User; sessionToken?: string } | void>;
 }) {
   const router = useRouter();
   const { establishSession } = useAuth();
@@ -48,12 +49,12 @@ export function AuthForm({
         router.push(`/verify-email/pending?${params.toString()}`);
       } else if (result?.user) {
         authDebug({ event: "login:submit-ok", user: { id: result.user.id, email: result.user.email } });
-        const user = await establishSession(result.user);
+        const user = await establishSession(result.user, result.sessionToken);
         authDebug({ event: "login:redirect", detail: getPostLoginPath(user) });
         router.replace(getPostLoginPath(user));
       } else {
         const { user: meUser } = await api.me();
-        const user = await establishSession(meUser);
+        const user = await establishSession(meUser, getStoredSessionToken());
         router.replace(getPostLoginPath(user));
       }
     } catch (err) {

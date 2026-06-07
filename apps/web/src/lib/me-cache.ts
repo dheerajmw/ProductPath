@@ -31,9 +31,9 @@ export function invalidateMeCache() {
   inflight = null;
 }
 
-/** Network call to /auth/me — bypasses cache (use after login to verify cookie). */
-export async function fetchMeFresh(): Promise<User> {
-  const { user } = await api.me();
+/** Network call to /auth/me — bypasses cache (use after login to verify session). */
+export async function fetchMeFresh(sessionToken?: string | null): Promise<User> {
+  const { user } = await api.me(sessionToken);
   cached = { user, fetchedAt: Date.now() };
   inflight = null;
   return user;

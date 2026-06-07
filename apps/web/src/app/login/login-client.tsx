@@ -157,8 +157,8 @@ export function LoginClient() {
         <AuthForm
           mode="login"
           onSubmit={async (data) => {
-            const { user } = await api.login(data);
-            return { user };
+            const result = await api.login(data);
+            return { user: result.user, sessionToken: result.sessionToken };
           }}
         />
         <p className="pp-body-muted" style={{ marginTop: 20, fontSize: "0.875rem" }}>

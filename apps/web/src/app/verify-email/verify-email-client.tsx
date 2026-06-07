@@ -24,8 +24,8 @@ export function VerifyEmailClient() {
 
     api
       .verifyEmail(token)
-      .then(async ({ user }) => {
-        const verified = await establishSession(user);
+      .then(async ({ user, sessionToken }) => {
+        const verified = await establishSession(user, sessionToken);
         setStatus("success");
         setMessage("Email verified. Redirecting…");
         setTimeout(() => router.replace(getPostLoginPath(verified)), 1500);

@@ -28,7 +28,7 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   status: AuthStatus;
-  establishSession: (user: User) => Promise<User>;
+  establishSession: (user: User, sessionToken?: string | null) => Promise<User>;
   refresh: () => Promise<User | null>;
   logout: () => Promise<void>;
 };
@@ -104,15 +104,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refresh, logState]);
 
   const establishSession = useCallback(
-    async (known: User) => {
+    async (known: User, sessionToken?: string | null) => {
       authGeneration.current += 1;
       const gen = authGeneration.current;
-      logState("establishSession:start", { userId: known.id });
+      logState("establishSession:start", {
+        userId: known.id,
+        hasToken: Boolean(sessionToken ?? getStoredSessionToken()),
+      });
 
-      // Do NOT setUser before cookie is verified — prevents premature redirects.
+      if (sessionToken) setStoredSessionToken(sessionToken);
+
       try {
         seedMeCache(known);
-        const verified = await fetchMeFresh();
+        const verified = await fetchMeFresh(sessionToken);
         if (gen !== authGeneration.current) {
           logState("establishSession:stale");
           return getCachedUser() ?? verified;

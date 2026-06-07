@@ -1,6 +1,10 @@
 import { getApiBaseUrl, REMOTE_API_URL } from "./api-url";
 import { authDebug } from "./auth-debug";
-import { getAuthHeader, getStoredSessionToken, setStoredSessionToken } from "./session-token";
+import {
+  buildAuthHeaders,
+  getStoredSessionToken,
+  setStoredSessionToken,
+} from "./session-token";
 
 export { getApiBaseUrl, REMOTE_API_URL as API_URL };
 
@@ -89,22 +93,23 @@ export async function checkApiReachable(): Promise<{
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+  explicitToken?: string | null,
+): Promise<T> {
   const base = getApiBaseUrl();
-  const authHeader = getAuthHeader();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(init?.headers as Record<string, string> | undefined),
-  };
-  if (authHeader) {
-    headers.Authorization = authHeader;
-  }
+  const headers = buildAuthHeaders(init, explicitToken);
+  const authHeader = headers.get("Authorization");
 
   let res: Response;
   try {
     res = await fetch(`${base}${path}`, {
-      ...init,
+      method: init?.method,
+      body: init?.body,
+      signal: init?.signal,
       credentials: "include",
+      cache: "no-store",
       headers,
     });
   } catch {
@@ -113,10 +118,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   const data = await parseJsonResponse(res);
 
+  if (path === "/auth/login" || path === "/auth/verify-email") {
+    const sessionToken = typeof data.sessionToken === "string" ? data.sessionToken : null;
+    if (sessionToken) setStoredSessionToken(sessionToken);
+  }
+
   if (path === "/auth/me" || path === "/auth/login") {
     authDebug({
       event: `api:${path}`,
-      detail: `status=${res.status} base=${base} auth=${authHeader ? "Bearer" : "none"}`,
+      detail: `status=${res.status} base=${base} auth=${authHeader ?? "none"}`,
       isAuthenticated: res.ok,
       token: getStoredSessionToken(),
     });
@@ -136,14 +146,11 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  login: async (body: { email: string; password: string }) => {
-    const result = await request<{ user: User; sessionToken?: string }>("/auth/login", {
+  login: (body: { email: string; password: string }) =>
+    request<{ user: User; sessionToken?: string }>("/auth/login", {
       method: "POST",
       body: JSON.stringify(body),
-    });
-    if (result.sessionToken) setStoredSessionToken(result.sessionToken);
-    return result;
-  },
+    }),
 
   logout: async () => {
     try {
@@ -153,16 +160,14 @@ export const api = {
     }
   },
 
-  me: () => request<{ user: User }>("/auth/me"),
+  me: (sessionToken?: string | null) =>
+    request<{ user: User }>("/auth/me", { method: "GET" }, sessionToken),
 
-  verifyEmail: async (token: string) => {
-    const result = await request<{ user: User; sessionToken?: string }>("/auth/verify-email", {
+  verifyEmail: (token: string) =>
+    request<{ user: User; sessionToken?: string }>("/auth/verify-email", {
       method: "POST",
       body: JSON.stringify({ token }),
-    });
-    if (result.sessionToken) setStoredSessionToken(result.sessionToken);
-    return result;
-  },
+    }),
 
   resendVerification: (email: string) =>
     request<{ message: string; devVerifyUrl?: string }>("/auth/resend-verification", {
@@ -269,12 +274,15 @@ export const api = {
   async uploadProjectFile(submissionId: string, file: File) {
     const form = new FormData();
     form.append("file", file);
+    const headers = buildAuthHeaders({ body: form });
     let res: Response;
     try {
       res = await fetch(`${getApiBaseUrl()}/projects/submissions/${submissionId}/upload`, {
         method: "POST",
         credentials: "include",
+        cache: "no-store",
         body: form,
+        headers,
       });
     } catch {
       throw createNetworkError();
