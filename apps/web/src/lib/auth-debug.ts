@@ -1,4 +1,6 @@
 /** Enable with NEXT_PUBLIC_AUTH_DEBUG=1 in Vercel or local .env */
+import { getStoredSessionToken } from "@/lib/session-token";
+
 const ENABLED =
   process.env.NEXT_PUBLIC_AUTH_DEBUG === "1" ||
   (typeof window !== "undefined" && (window as unknown as { __PP_AUTH_DEBUG?: boolean }).__PP_AUTH_DEBUG === true);
@@ -32,7 +34,7 @@ export function authDebug(payload: AuthDebugPayload) {
     ...payload,
     pathname,
     token,
-    localStorageToken: typeof window !== "undefined" ? localStorage.getItem("token") : null,
+    localStorageToken: typeof window !== "undefined" ? getStoredSessionToken() : null,
     ts: new Date().toISOString(),
   });
 }

@@ -13,8 +13,6 @@ export function getCachedUser(): User | null {
   return cached.user;
 }
 
-import { authDebug } from "@/lib/auth-debug";
-
 /** Seed cache after login — cancels stale in-flight /auth/me from app boot. */
 export function seedMeCache(user: User) {
   generation += 1;

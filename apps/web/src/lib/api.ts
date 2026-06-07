@@ -1,5 +1,6 @@
 import { getApiBaseUrl, REMOTE_API_URL } from "./api-url";
 import { authDebug } from "./auth-debug";
+import { getAuthHeader, getStoredSessionToken, setStoredSessionToken } from "./session-token";
 
 export { getApiBaseUrl, REMOTE_API_URL as API_URL };
 
@@ -90,15 +91,21 @@ export async function checkApiReachable(): Promise<{
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const base = getApiBaseUrl();
+  const authHeader = getAuthHeader();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(init?.headers as Record<string, string> | undefined),
+  };
+  if (authHeader) {
+    headers.Authorization = authHeader;
+  }
+
   let res: Response;
   try {
     res = await fetch(`${base}${path}`, {
       ...init,
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        ...init?.headers,
-      },
+      headers,
     });
   } catch {
     throw createNetworkError();
@@ -109,8 +116,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (path === "/auth/me" || path === "/auth/login") {
     authDebug({
       event: `api:${path}`,
-      detail: `status=${res.status} base=${base}`,
+      detail: `status=${res.status} base=${base} auth=${authHeader ? "Bearer" : "none"}`,
       isAuthenticated: res.ok,
+      token: getStoredSessionToken(),
     });
   }
 
@@ -128,18 +136,33 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  login: (body: { email: string; password: string }) =>
-    request<{ user: User }>("/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  login: async (body: { email: string; password: string }) => {
+    const result = await request<{ user: User; sessionToken?: string }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    if (result.sessionToken) setStoredSessionToken(result.sessionToken);
+    return result;
+  },
 
-  logout: () => request<{ ok: boolean }>("/auth/logout", { method: "POST" }),
+  logout: async () => {
+    try {
+      return await request<{ ok: boolean }>("/auth/logout", { method: "POST" });
+    } finally {
+      setStoredSessionToken(null);
+    }
+  },
 
   me: () => request<{ user: User }>("/auth/me"),
 
-  verifyEmail: (token: string) =>
-    request<{ user: User }>("/auth/verify-email", {
+  verifyEmail: async (token: string) => {
+    const result = await request<{ user: User; sessionToken?: string }>("/auth/verify-email", {
       method: "POST",
       body: JSON.stringify({ token }),
-    }),
+    });
+    if (result.sessionToken) setStoredSessionToken(result.sessionToken);
+    return result;
+  },
 
   resendVerification: (email: string) =>
     request<{ message: string; devVerifyUrl?: string }>("/auth/resend-verification", {

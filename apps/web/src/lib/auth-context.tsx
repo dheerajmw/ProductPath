@@ -11,8 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import { api, type User } from "@/lib/api";
+import { api, ApiError, type User } from "@/lib/api";
 import { authDebug } from "@/lib/auth-debug";
+import { setStoredSessionToken, getStoredSessionToken } from "@/lib/session-token";
 import {
   fetchMeCached,
   fetchMeFresh,
@@ -83,6 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return cached;
       }
       invalidateMeCache();
+      if (err instanceof ApiError && err.status === 401) {
+        setStoredSessionToken(null);
+      }
       setUser(null);
       setStatus("unauthenticated");
       logState("refresh:unauthenticated", {
@@ -95,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (initDone.current) return;
     initDone.current = true;
-    logState("init:start");
+    logState("init:start", { hasToken: Boolean(getStoredSessionToken()) });
     void refresh().finally(() => logState("init:done"));
   }, [refresh, logState]);
 
@@ -120,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return verified;
       } catch (err) {
         invalidateMeCache();
+        setStoredSessionToken(null);
         setUser(null);
         setStatus("unauthenticated");
         logState("establishSession:failed", {

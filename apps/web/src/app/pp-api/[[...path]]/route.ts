@@ -30,6 +30,9 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   const cookie = req.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
 
+  const authorization = req.headers.get("authorization");
+  if (authorization) headers.set("authorization", authorization);
+
   const contentType = req.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
 
@@ -64,7 +67,11 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   const setCookies = readSetCookieHeaders(upstream.headers);
   const sessionToken = extractSessionToken(setCookies);
   if (sessionToken) {
-    response.cookies.set(SESSION_COOKIE, decodeURIComponent(sessionToken), sessionCookieOptions);
+    try {
+      response.cookies.set(SESSION_COOKIE, decodeURIComponent(sessionToken), sessionCookieOptions);
+    } catch {
+      response.cookies.set(SESSION_COOKIE, sessionToken, sessionCookieOptions);
+    }
   } else if (req.method === "POST" && segments[0] === "auth" && segments[1] === "logout") {
     response.cookies.set(SESSION_COOKIE, "", { ...sessionCookieOptions, maxAge: 0 });
   }

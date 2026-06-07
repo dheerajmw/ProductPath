@@ -4,9 +4,9 @@ import {
   loginSchema,
   signupSchema,
   verifyEmailSchema,
-  SESSION_COOKIE,
 } from "@productpath/shared";
 import { setSessionCookie, clearSessionCookie } from "../lib/session-cookie";
+import { getSessionTokenFromRequest } from "../lib/session-token";
 import { z } from "zod";
 import {
   login,
@@ -45,7 +45,7 @@ router.post("/login", async (req, res, next) => {
     const input = loginSchema.parse(req.body);
     const result = await login(input, req.ip);
     setSessionCookie(res, result.sessionToken);
-    res.json({ user: result.user });
+    res.json({ user: result.user, sessionToken: result.sessionToken });
   } catch (e) {
     next(e);
   }
@@ -53,8 +53,8 @@ router.post("/login", async (req, res, next) => {
 
 router.post("/logout", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const token = req.cookies?.[SESSION_COOKIE] as string;
-    await logout(token, req.user?.id);
+    const token = getSessionTokenFromRequest(req);
+    if (token) await logout(token, req.user?.id);
     clearSessionCookie(res);
     res.json({ ok: true });
   } catch (e) {
@@ -67,7 +67,7 @@ router.post("/verify-email", async (req, res, next) => {
     const { token } = verifyEmailSchema.parse(req.body);
     const result = await verifyEmail(token);
     setSessionCookie(res, result.sessionToken);
-    res.json({ user: result.user });
+    res.json({ user: result.user, sessionToken: result.sessionToken });
   } catch (e) {
     next(e);
   }
