@@ -35,6 +35,9 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   const upstreamUrl = `${getRemoteApiUrl()}/${segments.join("/")}${req.nextUrl.search}`;
 
   const headers = new Headers();
+  // Plain JSON from Render — avoid forwarding compressed bytes + wrong Content-Encoding.
+  headers.set("accept-encoding", "identity");
+
   const cookie = req.headers.get("cookie");
   if (cookie) headers.set("cookie", cookie);
 
@@ -66,6 +69,8 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
     if (SKIP_RESPONSE_HEADERS.has(lower)) return;
     outHeaders.set(key, value);
   });
+  outHeaders.delete("content-encoding");
+  outHeaders.delete("content-length");
 
   const response = new NextResponse(body, {
     status: upstream.status,
