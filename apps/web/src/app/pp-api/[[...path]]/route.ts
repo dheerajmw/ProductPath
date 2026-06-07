@@ -22,6 +22,14 @@ const HOP_BY_HOP = new Set([
   "upgrade",
 ]);
 
+/** Do not forward length/encoding from upstream — causes truncated bodies when re-streaming. */
+const SKIP_RESPONSE_HEADERS = new Set([
+  ...HOP_BY_HOP,
+  "set-cookie",
+  "content-length",
+  "content-encoding",
+]);
+
 async function proxy(req: NextRequest, path: string[] | undefined) {
   const segments = path ?? [];
   const upstreamUrl = `${getRemoteApiUrl()}/${segments.join("/")}${req.nextUrl.search}`;
@@ -50,15 +58,16 @@ async function proxy(req: NextRequest, path: string[] | undefined) {
   }
 
   const upstream = await fetch(upstreamUrl, init);
+  const body = await upstream.arrayBuffer();
   const outHeaders = new Headers();
 
   upstream.headers.forEach((value, key) => {
     const lower = key.toLowerCase();
-    if (HOP_BY_HOP.has(lower) || lower === "set-cookie") return;
+    if (SKIP_RESPONSE_HEADERS.has(lower)) return;
     outHeaders.set(key, value);
   });
 
-  const response = new NextResponse(upstream.body, {
+  const response = new NextResponse(body, {
     status: upstream.status,
     statusText: upstream.statusText,
     headers: outHeaders,
