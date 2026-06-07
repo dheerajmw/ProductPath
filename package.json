@@ -2,12 +2,14 @@
   "name": "productpath",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
-    "db:generate": "pnpm --filter @productpath/database generate",
+    "build": "pnpm exec turbo run build",
+    "build:api": "pnpm --filter @productpath/api... run build",
+    "build:render": "pnpm run db:generate && pnpm run build:api",
+    "dev": "pnpm exec turbo run dev --parallel",
+    "lint": "pnpm exec turbo run lint",
+    "typecheck": "pnpm exec turbo run typecheck",
+    "test": "pnpm exec turbo run test",
+    "db:generate": "prisma generate --schema packages/database/prisma/schema.prisma",
     "db:migrate": "pnpm --filter @productpath/database migrate:dev",
     "db:migrate:deploy": "pnpm --filter @productpath/database migrate:deploy",
     "db:push": "pnpm --filter @productpath/database push",
@@ -15,6 +17,7 @@
     "db:studio": "pnpm --filter @productpath/database studio"
   },
   "devDependencies": {
+    "prisma": "^6.9.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
