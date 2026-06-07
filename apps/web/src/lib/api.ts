@@ -1,12 +1,11 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:4000";
+import { getApiBaseUrl, REMOTE_API_URL } from "./api-url";
 
-export { API_URL };
+export { getApiBaseUrl, REMOTE_API_URL as API_URL };
 
 function assertProductionApiUrl() {
   if (typeof window === "undefined") return;
   if (process.env.NODE_ENV !== "production") return;
-  if (/localhost|127\.0\.0\.1/.test(API_URL)) {
+  if (/localhost|127\.0\.0\.1/.test(REMOTE_API_URL)) {
     console.error(
       "[ProductPath] NEXT_PUBLIC_API_URL points at localhost in production. " +
         "Deploy apps/api (see docs/vercel-production.md) and set NEXT_PUBLIC_API_URL on Vercel.",
@@ -28,11 +27,12 @@ export class ApiError extends Error {
 }
 
 function createNetworkError(): ApiError {
-  const isLocalApi = /localhost|127\.0\.0\.1/.test(API_URL);
+  const base = getApiBaseUrl();
+  const isLocalApi = /localhost|127\.0\.0\.1/.test(REMOTE_API_URL);
   const hint = isLocalApi
     ? "Start the API locally (pnpm dev) or set NEXT_PUBLIC_API_URL on Vercel."
-    : "The API may be waking up on Render (wait 30–60s and retry). If this persists, confirm NEXT_PUBLIC_API_URL and redeploy Vercel after env changes.";
-  return new ApiError(`Cannot reach the API at ${API_URL}. ${hint}`, 0, "NETWORK_ERROR");
+    : "The API may be waking up on Render (wait 30–60s and retry). If this persists, confirm NEXT_PUBLIC_API_URL and redeploy Vercel.";
+  return new ApiError(`Cannot reach the API at ${base}. ${hint}`, 0, "NETWORK_ERROR");
 }
 
 function createHttpError(res: Response, data: Record<string, unknown>): ApiError {
@@ -67,7 +67,7 @@ export async function checkApiReachable(): Promise<{
   error?: string;
 }> {
   try {
-    const res = await fetch(`${API_URL}/health`, {
+    const res = await fetch(`${getApiBaseUrl()}/health`, {
       method: "GET",
       cache: "no-store",
     });
@@ -90,7 +90,7 @@ export async function checkApiReachable(): Promise<{
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, {
+    res = await fetch(`${getApiBaseUrl()}${path}`, {
       ...init,
       credentials: "include",
       headers: {
@@ -238,7 +238,7 @@ export const api = {
     form.append("file", file);
     let res: Response;
     try {
-      res = await fetch(`${API_URL}/projects/submissions/${submissionId}/upload`, {
+      res = await fetch(`${getApiBaseUrl()}/projects/submissions/${submissionId}/upload`, {
         method: "POST",
         credentials: "include",
         body: form,

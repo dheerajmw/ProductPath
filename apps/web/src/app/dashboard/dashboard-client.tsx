@@ -44,7 +44,7 @@ function ProgressRing({ percent }: { percent: number }) {
         <span style={{ fontSize: "2rem", fontWeight: 800, color: "var(--pp-primary)" }}>
           {percent}%
         </span>
-        <span className="pp-label-caps">Overall progress</span>
+        <span className="pp-label-caps">Learning prep</span>
       </div>
     </div>
   );
@@ -75,7 +75,7 @@ export function DashboardClient() {
       })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 401) {
-          router.push("/login");
+          router.replace("/login?role=candidate");
           return;
         }
         setError(err instanceof ApiError ? err.message : "Failed to load dashboard");
@@ -149,8 +149,8 @@ export function DashboardClient() {
               </h2>
               <p className="pp-body-muted" style={{ maxWidth: 480, margin: "0 0 20px" }}>
                 {activeRole
-                  ? `Your ${activeRole.name} path is in progress. Continue learning, close skill gaps, and build proof of work.`
-                  : "Select a product role to start your learning roadmap."}
+                  ? `Your ${activeRole.name} proof-of-work path is in progress. Submit projects, take the skill assessment when ready, and earn verification.`
+                  : "Select a product role to start submitting projects."}
               </p>
               {verification ? (
                 <div style={{ marginBottom: 20 }}>
@@ -169,11 +169,11 @@ export function DashboardClient() {
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {activeRole ? (
                   <>
-                    <Link href="/learn">
-                      <Button>Continue learning</Button>
+                    <Link href="/projects">
+                      <Button>Submit a project</Button>
                     </Link>
                     <Link href="/assessments">
-                      <Button variant="secondary">Assessments</Button>
+                      <Button variant="secondary">Skill assessment</Button>
                     </Link>
                   </>
                 ) : (
@@ -204,10 +204,19 @@ export function DashboardClient() {
           <div className="pp-glass-card pp-stat-card">
             <span className="pp-label-caps">Proof of work</span>
             <p className="pp-headline-md" style={{ margin: "8px 0 0", fontSize: "1.25rem" }}>
-              Projects
+              Submissions
             </p>
             <Link href="/projects" style={{ display: "inline-block", marginTop: 12, fontSize: "0.875rem", fontWeight: 600 }}>
-              Projects hub →
+              Project hub →
+            </Link>
+          </div>
+          <div className="pp-glass-card pp-stat-card">
+            <span className="pp-label-caps">Optional prep</span>
+            <p className="pp-headline-md" style={{ margin: "8px 0 0", fontSize: "1.25rem" }}>
+              Learn first
+            </p>
+            <Link href="/learn" style={{ display: "inline-block", marginTop: 12, fontSize: "0.875rem", fontWeight: 600 }}>
+              Prepare to learn →
             </Link>
           </div>
           <div className="pp-glass-card pp-stat-card">
@@ -231,14 +240,23 @@ export function DashboardClient() {
           marginTop: 24,
         }}
       >
-        <Link href="/learn" className="pp-glass-card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
+        <Link href="/projects" className="pp-glass-card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
           <span className="material-symbols-outlined" style={{ color: "var(--pp-primary)", fontSize: 28 }}>
-            map
+            folder_special
           </span>
           <h3 className="pp-headline-md" style={{ fontSize: "1.125rem", margin: "16px 0 8px" }}>
-            Role roadmaps
+            Project submissions
           </h3>
-          <p className="pp-body-muted" style={{ margin: 0 }}>Structured modules for your active role.</p>
+          <p className="pp-body-muted" style={{ margin: 0 }}>Your main proof-of-work — draft, upload, and submit projects.</p>
+        </Link>
+        <Link href="/learn" className="pp-glass-card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
+          <span className="material-symbols-outlined" style={{ color: "var(--pp-primary-fixed-dim)", fontSize: 28 }}>
+            school
+          </span>
+          <h3 className="pp-headline-md" style={{ fontSize: "1.125rem", margin: "16px 0 8px" }}>
+            Prepare to learn
+          </h3>
+          <p className="pp-body-muted" style={{ margin: 0 }}>Optional roadmaps before your skill assessment.</p>
         </Link>
         <Link href="/assessments" className="pp-glass-card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
           <span className="material-symbols-outlined" style={{ color: "var(--pp-secondary)", fontSize: 28 }}>
