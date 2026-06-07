@@ -4,7 +4,8 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, Label, Alert } from "@productpath/ui";
 import { normalizeEmail } from "@productpath/shared";
-import { api, ApiError, type User } from "@/lib/api";
+import { api, type User } from "@/lib/api";
+import { formatApiErrorMessage } from "@/lib/api-errors";
 import { getPostLoginPath } from "@/lib/auth-redirect";
 import { invalidateMeCache } from "@/lib/me-cache";
 
@@ -52,13 +53,7 @@ export function AuthForm({
         router.push(getPostLoginPath(user));
       }
     } catch (err) {
-      const message =
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Something went wrong";
-      setError(message);
+      setError(formatApiErrorMessage(err));
     } finally {
       setLoading(false);
     }

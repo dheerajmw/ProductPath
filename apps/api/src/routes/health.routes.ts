@@ -4,6 +4,11 @@ import { prisma } from "@productpath/database";
 const router = Router();
 const startedAt = new Date();
 
+/** Public root — browser visits to API host without a path. */
+router.get("/", (_req, res) => {
+  res.json({ status: "ok", service: "productpath-api", health: "/health" });
+});
+
 router.get("/health", async (_req, res) => {
   let dbOk = false;
   try {

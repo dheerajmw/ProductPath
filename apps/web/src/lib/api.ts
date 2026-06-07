@@ -1,6 +1,8 @@
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:4000";
 
+export { API_URL };
+
 function assertProductionApiUrl() {
   if (typeof window === "undefined") return;
   if (process.env.NODE_ENV !== "production") return;
@@ -25,6 +27,66 @@ export class ApiError extends Error {
   }
 }
 
+function createNetworkError(): ApiError {
+  const isLocalApi = /localhost|127\.0\.0\.1/.test(API_URL);
+  const hint = isLocalApi
+    ? "Start the API locally (pnpm dev) or set NEXT_PUBLIC_API_URL on Vercel."
+    : "The API may be waking up on Render (wait 30–60s and retry). If this persists, confirm NEXT_PUBLIC_API_URL and redeploy Vercel after env changes.";
+  return new ApiError(`Cannot reach the API at ${API_URL}. ${hint}`, 0, "NETWORK_ERROR");
+}
+
+function createHttpError(res: Response, data: Record<string, unknown>): ApiError {
+  const status = res.status;
+  const code = typeof data.code === "string" ? data.code : undefined;
+  const serverMessage = typeof data.error === "string" ? data.error : "Request failed";
+
+  if (status === 401) {
+    return new ApiError(
+      serverMessage === "Authentication required" ? "Please log in to continue." : serverMessage,
+      401,
+      code ?? "UNAUTHORIZED",
+      data,
+    );
+  }
+
+  if (status >= 500) {
+    return new ApiError("Server error — please try again in a moment.", status, code ?? "SERVER_ERROR", data);
+  }
+
+  return new ApiError(serverMessage, status, code, data);
+}
+
+async function parseJsonResponse(res: Response): Promise<Record<string, unknown>> {
+  return res.json().catch(() => ({}));
+}
+
+/** Public connectivity check — uses GET /health (never a protected route). */
+export async function checkApiReachable(): Promise<{
+  ok: boolean;
+  status?: string;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(`${API_URL}/health`, {
+      method: "GET",
+      cache: "no-store",
+    });
+    const data = await parseJsonResponse(res);
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: `Health check returned HTTP ${res.status}`,
+      };
+    }
+    return {
+      ok: true,
+      status: typeof data.status === "string" ? data.status : "ok",
+    };
+  } catch {
+    return { ok: false, error: createNetworkError().message };
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -37,22 +99,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       },
     });
   } catch {
-    throw new ApiError(
-      `Cannot reach the API at ${API_URL}. Start the API locally (pnpm dev) or set NEXT_PUBLIC_API_URL on Vercel.`,
-      0,
-      "NETWORK_ERROR",
-    );
+    throw createNetworkError();
   }
 
-  const data = await res.json().catch(() => ({}));
+  const data = await parseJsonResponse(res);
 
   if (!res.ok) {
-    throw new ApiError(
-      (data as { error?: string }).error ?? "Request failed",
-      res.status,
-      (data as { code?: string }).code,
-      data,
-    );
+    throw createHttpError(res, data);
   }
 
   return data as T;
@@ -183,18 +236,19 @@ export const api = {
   async uploadProjectFile(submissionId: string, file: File) {
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch(`${API_URL}/projects/submissions/${submissionId}/upload`, {
-      method: "POST",
-      credentials: "include",
-      body: form,
-    });
-    const data = await res.json().catch(() => ({}));
+    let res: Response;
+    try {
+      res = await fetch(`${API_URL}/projects/submissions/${submissionId}/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      });
+    } catch {
+      throw createNetworkError();
+    }
+    const data = await parseJsonResponse(res);
     if (!res.ok) {
-      throw new ApiError(
-        (data as { error?: string }).error ?? "Upload failed",
-        res.status,
-        (data as { code?: string }).code,
-      );
+      throw createHttpError(res, data);
     }
     return data as { submission: ProjectSubmissionSummary };
   },

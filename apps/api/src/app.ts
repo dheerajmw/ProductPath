@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import { RATE_LIMITS } from "@productpath/shared";
 import { logger } from "./lib/logger";
+import { isAllowedCorsOrigin } from "./lib/cors-origins";
 import { createRateLimiter, isRateLimitDisabled } from "./lib/rate-limit";
 import { errorHandler } from "./middleware/error-handler";
 import { authRoutes } from "./routes/auth.routes";
@@ -36,10 +37,22 @@ export function createApp() {
     .split(",")
     .map((o) => o.trim());
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      // Allow cross-origin fetches from Vercel → Render (default "same-origin" blocks credentialed reads)
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    }),
+  );
   app.use(
     cors({
-      origin: corsOrigins,
+      origin(origin, callback) {
+        if (!origin || isAllowedCorsOrigin(origin)) {
+          callback(null, true);
+          return;
+        }
+        logger.warn({ origin, corsOrigins }, "CORS request blocked");
+        callback(null, false);
+      },
       credentials: true,
     }),
   );
