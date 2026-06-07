@@ -1,9 +1,14 @@
 import path from "node:path";
-import { loadEnvConfig } from "@next/env";
+import { createRequire } from "node:module";
 import type { NextConfig } from "next";
 
-// Monorepo: load repo-root .env (NEXT_PUBLIC_API_URL, etc.)
-loadEnvConfig(path.join(__dirname, "../.."));
+// Load monorepo root .env for local builds (Vercel injects env in the dashboard).
+const require = createRequire(import.meta.url);
+try {
+  require("@next/env").loadEnvConfig(path.join(__dirname, "../.."));
+} catch {
+  /* @next/env ships with next — optional during type-only checks */
+}
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@productpath/ui"],
