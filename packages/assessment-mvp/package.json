@@ -6,12 +6,13 @@
   "types": "./src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^3.25.51"
   },
   "devDependencies": {
+    "@types/node": "^22.15.30",
     "typescript": "^5.8.3"
   }
 }
