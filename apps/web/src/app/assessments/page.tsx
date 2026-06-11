@@ -89,8 +89,9 @@ export default function AssessmentsHubPage() {
           {hub.learningGate.warn && !hub.learningGate.blocked ? (
             <div style={{ marginTop: 16 }}>
               <Alert variant="info">
-                Learning progress is {hub.learningGate.progressPercent}% (under{" "}
-                {hub.learningGate.warnThreshold}%). Consider finishing more modules first.
+                Learning progress is                 {hub.learningGate.progressPercent}% (under{" "}
+                {hub.learningGate.warnThreshold}%). Optional:{" "}
+                <Link href="/learn/roadmaps">finish more roadmap modules</Link> before testing.
               </Alert>
             </div>
           ) : null}
@@ -99,8 +100,10 @@ export default function AssessmentsHubPage() {
             <div style={{ marginTop: 16 }}>
               <Alert variant="error">
                 Complete at least {hub.learningGate.blockThreshold}% of your roadmap before starting
-                ({hub.learningGate.progressPercent}% now).{" "}
-                <Link href="/learn">Continue learning</Link>
+                ({hub.learningGate.progressPercent}% now), or continue optional prep.{" "}
+                <Link href="/learn/roadmaps">Browse roadmaps</Link>
+                {" · "}
+                <Link href="/learn">Prepare to learn</Link>
               </Alert>
             </div>
           ) : null}

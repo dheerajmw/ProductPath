@@ -2,11 +2,11 @@ import { PrismaClient } from "@prisma/client";
 
 /** Skill slug → module slugs on the PM roadmap (priority order). */
 const PM_SKILL_MODULE_MAP: Record<string, string[]> = {
-  "problem-solving": ["intro-to-pm"],
-  "user-thinking": ["user-research-basics"],
-  communication: ["intro-to-pm", "user-research-basics"],
-  "analytical-thinking": ["roadmapping"],
-  "product-strategy": ["roadmapping"],
+  "problem-solving": ["pm-foundations"],
+  "user-thinking": ["pm-foundations", "ai-pm"],
+  communication: ["pm-foundations", "ai-pm"],
+  "analytical-thinking": ["pm-execution-interviews"],
+  "product-strategy": ["pm-execution-interviews"],
 };
 
 export async function seedRecommendations(prisma: PrismaClient) {

@@ -1,0 +1,68 @@
+import type { LearningResource } from "../../types/assessment";
+
+export const productMarketingResources: LearningResource[] = [
+  {
+    title: "Product Marketing Alliance",
+    topic: "positioning",
+    type: "article",
+    url: "https://productmarketingalliance.com/",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "PMA positioning and messaging guide",
+    topic: "messaging",
+    type: "article",
+    url: "https://www.productmarketingalliance.com/positioning-and-messaging/",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Jobs-to-be-done framework",
+    topic: "positioning",
+    type: "article",
+    url: "https://www.intercom.com/blog/jobs-to-be-done-framework/",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+  {
+    title: "HubSpot go-to-market strategy",
+    topic: "gtm-strategy",
+    type: "article",
+    url: "https://blog.hubspot.com/marketing/go-to-market-strategy",
+    difficulty: "beginner",
+    estimated_time: 30,
+  },
+  {
+    title: "ProductPlan GTM glossary",
+    topic: "gtm-strategy",
+    type: "article",
+    url: "https://www.productplan.com/glossary/go-to-market-strategy/",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+  {
+    title: "ProductLed blog",
+    topic: "growth-thinking",
+    type: "blog",
+    url: "https://productled.com/blog/",
+    difficulty: "intermediate",
+    estimated_time: 25,
+  },
+  {
+    title: "Reforge blog",
+    topic: "growth-thinking",
+    type: "blog",
+    url: "https://www.reforge.com/blog",
+    difficulty: "intermediate",
+    estimated_time: 30,
+  },
+  {
+    title: "Copyhackers blog",
+    topic: "messaging",
+    type: "blog",
+    url: "https://copyhackers.com/blog/",
+    difficulty: "intermediate",
+    estimated_time: 20,
+  },
+];

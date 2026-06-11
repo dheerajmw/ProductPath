@@ -12,61 +12,43 @@ import {
   Button,
   VerificationBadge,
 } from "@productpath/ui";
-import { api, ApiError } from "@/lib/api";
-import { fetchMeCached } from "@/lib/me-cache";
+import { api } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
+import { AuthLoadingScreen } from "@/components/auth-guard";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 
 export default function AccountSettingsPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [roleName, setRoleName] = useState<string | null>(null);
-  const [emailVerified, setEmailVerified] = useState(false);
+  const { user, loading: authLoading } = useRequireAuth({ loginSource: "settings/account" });
   const [verificationState, setVerificationState] = useState<string | null>(null);
+  const [verificationLoading, setVerificationLoading] = useState(true);
+
+  const activeRoleId = user?.candidateProfile?.activeRoleId ?? null;
+  const displayName =
+    user?.candidateProfile?.displayName?.trim() || user?.email.split("@")[0] || "Member";
+  const roleName = user?.candidateProfile?.activeRole?.name ?? null;
+  const emailVerified = user?.emailVerified ?? false;
 
   useEffect(() => {
-    fetchMeCached()
-      .then(async (user) => {
-        setDisplayName(user.candidateProfile?.displayName?.trim() || user.email.split("@")[0] || "Member");
-        setEmail(user.email);
-        setEmailVerified(user.emailVerified);
-        setRoleName(user.candidateProfile?.activeRole?.name ?? null);
+    if (authLoading || !user) return;
 
-        if (!user.candidateProfile?.activeRoleId) {
-          router.replace("/onboarding/role");
-          return;
-        }
+    if (!activeRoleId) {
+      router.replace("/onboarding/role");
+      return;
+    }
 
-        try {
-          const verification = await api.getVerification();
-          setVerificationState(verification.state);
-        } catch {
-          setVerificationState(null);
-        }
-      })
-      .catch((err) => {
-        if (err instanceof ApiError && err.status === 401) router.push("/login");
-        else setError(err instanceof ApiError ? err.message : "Failed to load account");
-      })
-      .finally(() => setLoading(false));
-  }, [router]);
+    setVerificationLoading(true);
+    api
+      .getVerification()
+      .then((verification) => setVerificationState(verification.state))
+      .catch(() => setVerificationState(null))
+      .finally(() => setVerificationLoading(false));
+  }, [authLoading, user, activeRoleId, router]);
 
-  if (loading) {
+  if (authLoading || !user) {
     return (
       <CandidateAppShell title="My account">
-        <div style={{ display: "flex", justifyContent: "center", padding: 48 }}>
-          <Spinner size={32} />
-        </div>
-      </CandidateAppShell>
-    );
-  }
-
-  if (error) {
-    return (
-      <CandidateAppShell title="My account">
-        <Alert variant="error">{error}</Alert>
+        <AuthLoadingScreen label="Loading account…" />
       </CandidateAppShell>
     );
   }
@@ -96,7 +78,7 @@ export default function AccountSettingsPage() {
             </span>
             <span>
               <span style={{ color: "var(--pp-fg)", fontWeight: 500 }}>Email </span>
-              {email}
+              {user.email}
             </span>
           </p>
           <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
@@ -117,7 +99,11 @@ export default function AccountSettingsPage() {
               </Alert>
             </div>
           ) : null}
-          {verificationState ? (
+          {verificationLoading ? (
+            <div style={{ marginTop: 16 }}>
+              <Spinner size={20} />
+            </div>
+          ) : verificationState ? (
             <div style={{ marginTop: 16 }}>
               <VerificationBadge
                 state={

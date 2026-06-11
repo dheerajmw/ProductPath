@@ -30,7 +30,7 @@ type AuthContextValue = {
   loading: boolean;
   status: AuthStatus;
   establishSession: (user: User, sessionToken?: string | null) => Promise<User>;
-  refresh: () => Promise<User | null>;
+  refresh: (options?: { force?: boolean }) => Promise<User | null>;
   logout: () => Promise<void>;
 };
 
@@ -59,11 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user, status, pathname],
   );
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (options?: { force?: boolean }) => {
     const gen = authGeneration.current;
-    logState("refresh:start");
+    logState("refresh:start", { force: Boolean(options?.force) });
     try {
-      const me = await fetchMeCached();
+      if (options?.force) invalidateMeCache();
+      const me = options?.force ? await fetchMeFresh() : await fetchMeCached();
       if (!isValidUser(me)) {
         throw new Error("Invalid user in session response");
       }

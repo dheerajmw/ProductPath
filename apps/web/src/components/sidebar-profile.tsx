@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { api, type User } from "@/lib/api";
-import { fetchMeCached } from "@/lib/me-cache";
+import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -14,47 +14,38 @@ function initials(name: string) {
 }
 
 export function CandidateSidebarProfile() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [statusLabel, setStatusLabel] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+
+  const activeRoleId = user?.candidateProfile?.activeRoleId ?? null;
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const user = await fetchMeCached();
-        if (cancelled) return;
-        setUser(user);
-
-        const roleId = user.candidateProfile?.activeRoleId;
-        if (!roleId) {
-          setStatusLabel("Getting started");
-          return;
-        }
-
-        try {
-          const verification = await api.getVerification();
-          if (!cancelled) {
-            setStatusLabel(verification.stateLabel);
-          }
-        } catch {
-          if (!cancelled) setStatusLabel("Learning");
-        }
-      } catch {
-        if (!cancelled) setUser(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    if (authLoading || !user) {
+      setStatusLabel("");
+      return;
     }
 
-    void load();
+    if (!activeRoleId) {
+      setStatusLabel("Getting started");
+      return;
+    }
+
+    let cancelled = false;
+    api
+      .getVerification()
+      .then((verification) => {
+        if (!cancelled) setStatusLabel(verification.stateLabel);
+      })
+      .catch(() => {
+        if (!cancelled) setStatusLabel("Learning");
+      });
+
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authLoading, user, activeRoleId]);
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="pp-sidebar-profile pp-sidebar-profile--loading" aria-hidden>
         <div className="pp-sidebar-profile-avatar pp-sidebar-profile-skeleton" />
@@ -92,29 +83,9 @@ export function CandidateSidebarProfile() {
 }
 
 export function RecruiterSidebarProfile() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchMeCached()
-      .then((user) => {
-        if (!cancelled) setUser(user);
-      })
-      .catch(() => {
-        if (!cancelled) setUser(null);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="pp-sidebar-profile pp-sidebar-profile--loading" aria-hidden>
         <div className="pp-sidebar-profile-avatar pp-sidebar-profile-skeleton" />

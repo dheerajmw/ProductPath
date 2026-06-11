@@ -1,0 +1,68 @@
+import type { LearningResource } from "../../types/assessment";
+
+export const productOperationsResources: LearningResource[] = [
+  {
+    title: "Atlassian product operations",
+    topic: "operational-reasoning",
+    type: "article",
+    url: "https://www.atlassian.com/work-management/project-management/product-operations",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "Asana project management basics",
+    topic: "workflow-optimization",
+    type: "article",
+    url: "https://asana.com/resources/project-management-basics",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Zapier blog — automation",
+    topic: "automation-thinking",
+    type: "blog",
+    url: "https://zapier.com/blog/",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "Atlassian Agile overview",
+    topic: "workflow-optimization",
+    type: "article",
+    url: "https://www.atlassian.com/agile",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "OpenAI platform docs",
+    topic: "automation-thinking",
+    type: "tool",
+    url: "https://platform.openai.com/docs",
+    difficulty: "intermediate",
+    estimated_time: 30,
+  },
+  {
+    title: "Intercom — AI customer service",
+    topic: "operational-reasoning",
+    type: "article",
+    url: "https://www.intercom.com/blog/ai-customer-service/",
+    difficulty: "intermediate",
+    estimated_time: 20,
+  },
+  {
+    title: "Retool blog",
+    topic: "automation-thinking",
+    type: "blog",
+    url: "https://retool.com/blog/",
+    difficulty: "intermediate",
+    estimated_time: 25,
+  },
+  {
+    title: "Notion templates",
+    topic: "kpi-analysis",
+    type: "tool",
+    url: "https://www.notion.so/templates",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+];

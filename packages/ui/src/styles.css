@@ -51,6 +51,7 @@
   --pp-header-height: 64px;
   --pp-container-max: 1280px;
   --pp-gutter: 24px;
+  --pp-gutter-mobile: 16px;
 
   --pp-shadow-primary: 0 0 20px rgba(173, 198, 255, 0.2);
   --pp-glow-primary: 0 0 20px rgba(173, 198, 255, 0.4);
@@ -359,4 +360,173 @@
   font-size: 1.25rem;
   line-height: 1;
   vertical-align: middle;
+}
+
+/* App shell — responsive sidebar (drawer on mobile, fixed on desktop) */
+.pp-app-shell {
+  min-height: 100vh;
+  background: var(--pp-bg);
+  font-family: var(--pp-font);
+  color: var(--pp-fg);
+}
+
+.pp-app-shell-sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: var(--pp-gutter-mobile);
+  background: var(--pp-surface-container-high);
+  border-right: 1px solid var(--pp-border);
+  overflow-y: auto;
+}
+
+.pp-app-shell-sidebar-head {
+  margin-bottom: 24px;
+}
+
+.pp-app-shell-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.pp-app-shell-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pp-app-shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: var(--pp-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px var(--pp-gutter-mobile);
+  background: var(--pp-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--pp-border);
+}
+
+.pp-app-shell-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pp-app-shell-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pp-app-shell-title {
+  margin: 0;
+  font-size: clamp(1rem, 4vw, 1.375rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pp-app-shell-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--pp-border);
+  border-radius: var(--pp-radius);
+  background: var(--pp-surface-container-low);
+  color: var(--pp-fg);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.pp-app-shell-menu-btn:hover {
+  background: var(--pp-surface-container);
+  border-color: var(--pp-glass-hover-border);
+}
+
+.pp-app-shell-menu-btn .material-symbols-outlined {
+  font-size: 1.375rem;
+}
+
+.pp-app-shell-content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--pp-container-max);
+  margin: 0 auto;
+  padding: 8px var(--pp-gutter-mobile) 48px;
+}
+
+.pp-app-shell-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --pp-gutter: var(--pp-gutter-mobile);
+  }
+
+  .pp-app-shell-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 70;
+    width: min(300px, 88vw);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: none;
+  }
+
+  .pp-app-shell-sidebar--open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pp-app-shell-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 60;
+    width: var(--pp-sidebar-width);
+    padding: var(--pp-gutter);
+    transform: none;
+  }
+
+  .pp-app-shell-main {
+    margin-left: var(--pp-sidebar-width);
+  }
+
+  .pp-app-shell-header {
+    padding: 0 var(--pp-gutter);
+    height: var(--pp-header-height);
+  }
+
+  .pp-app-shell-content {
+    padding: 8px var(--pp-gutter) 48px;
+  }
+
+  .pp-app-shell-menu-btn,
+  .pp-app-shell-backdrop {
+    display: none;
+  }
 }

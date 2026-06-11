@@ -1,0 +1,68 @@
+import type { LearningResource } from "../../types/assessment";
+
+export const productManagementResources: LearningResource[] = [
+  {
+    title: "What is Product Management?",
+    topic: "product-sense",
+    type: "article",
+    url: "https://www.productschool.com/blog/product-management-2/what-is-product-management",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+  {
+    title: "PM fundamentals (YouTube)",
+    topic: "product-sense",
+    type: "video",
+    url: "https://www.youtube.com/watch?v=yUOC-Y0f5ZQ",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "RICE scoring model",
+    topic: "prioritization",
+    type: "article",
+    url: "https://www.productplan.com/glossary/rice-scoring-model/",
+    difficulty: "beginner",
+    estimated_time: 10,
+  },
+  {
+    title: "Mixpanel blog — product metrics",
+    topic: "metrics",
+    type: "blog",
+    url: "https://mixpanel.com/blog/",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Atlassian — writing requirements",
+    topic: "execution",
+    type: "article",
+    url: "https://www.atlassian.com/agile/product-management/requirements",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "OpenAI docs — platform overview",
+    topic: "ai-pm-basics",
+    type: "tool",
+    url: "https://platform.openai.com/docs",
+    difficulty: "intermediate",
+    estimated_time: 30,
+  },
+  {
+    title: "OpenAI evals guide",
+    topic: "ai-pm-basics",
+    type: "article",
+    url: "https://platform.openai.com/docs/guides/evals",
+    difficulty: "intermediate",
+    estimated_time: 25,
+  },
+  {
+    title: "Lenny's Newsletter",
+    topic: "product-sense",
+    type: "blog",
+    url: "https://www.lennysnewsletter.com/",
+    difficulty: "intermediate",
+    estimated_time: 30,
+  },
+];

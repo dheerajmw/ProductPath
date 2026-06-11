@@ -17,6 +17,7 @@ import {
 } from "@productpath/ui";
 import { api, ApiError, type RecruiterMeResponse, type TalentSearchResponse } from "@/lib/api";
 import { RecruiterShell } from "@/components/recruiter-shell";
+import { RecruiterPendingVerification } from "@/components/recruiter-pending-verification";
 
 export default function RecruiterSearchPage() {
   const router = useRouter();
@@ -78,10 +79,7 @@ export default function RecruiterSearchPage() {
   if (me && !me.verified) {
     return (
       <RecruiterShell title="Talent search">
-        <Alert variant="info">
-          Your recruiter account is pending verification. You will be able to search talent once an
-          admin approves your company{me.companyDomain ? ` or your email matches @${me.companyDomain}` : ""}.
-        </Alert>
+        <RecruiterPendingVerification profile={me} />
       </RecruiterShell>
     );
   }

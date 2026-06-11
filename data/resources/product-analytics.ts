@@ -1,0 +1,68 @@
+import type { LearningResource } from "../../types/assessment";
+
+export const productAnalyticsResources: LearningResource[] = [
+  {
+    title: "Mode SQL tutorial",
+    topic: "sql-basics",
+    type: "course",
+    url: "https://mode.com/sql-tutorial/",
+    difficulty: "beginner",
+    estimated_time: 60,
+  },
+  {
+    title: "SQL basics (YouTube)",
+    topic: "sql-basics",
+    type: "video",
+    url: "https://www.youtube.com/watch?v=HXV3zeQKqGY",
+    difficulty: "beginner",
+    estimated_time: 45,
+  },
+  {
+    title: "Mixpanel blog",
+    topic: "product-metrics",
+    type: "blog",
+    url: "https://mixpanel.com/blog/",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Amplitude blog",
+    topic: "funnel-analysis",
+    type: "blog",
+    url: "https://amplitude.com/blog",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Optimizely A/B testing glossary",
+    topic: "experimentation",
+    type: "article",
+    url: "https://www.optimizely.com/optimization-glossary/ab-testing/",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+  {
+    title: "OpenAI evals guide",
+    topic: "product-metrics",
+    type: "article",
+    url: "https://platform.openai.com/docs/guides/evals",
+    difficulty: "intermediate",
+    estimated_time: 25,
+  },
+  {
+    title: "Kaggle Learn",
+    topic: "sql-basics",
+    type: "course",
+    url: "https://www.kaggle.com/learn",
+    difficulty: "intermediate",
+    estimated_time: 90,
+  },
+  {
+    title: "Looker Studio",
+    topic: "funnel-analysis",
+    type: "tool",
+    url: "https://lookerstudio.google.com/",
+    difficulty: "beginner",
+    estimated_time: 30,
+  },
+];

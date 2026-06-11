@@ -28,6 +28,7 @@ import {
   interestRoutes,
 } from "./routes/recruiters.routes";
 import { communityRoutes } from "./routes/community.routes";
+import { mvpAssessmentRoutes } from "./modules/assessment/mvp-assessment.routes.js";
 import path from "node:path";
 
 export function createApp() {
@@ -100,6 +101,7 @@ export function createApp() {
   app.use("/internal", internalRoutes);
   app.use("/modules", modulesRoutes);
   app.use("/assessments", assessmentsRoutes);
+  app.use("/assessment", mvpAssessmentRoutes);
   app.use("/attempts", attemptsRoutes);
   app.use("/projects", projectsRoutes);
   app.use(reviewerRoutes);

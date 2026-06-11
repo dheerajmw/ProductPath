@@ -1,115 +1,90 @@
 import { PrismaClient, ResourceType } from "@prisma/client";
+import { buildSeedModulesForRole, getCurriculumForRole } from "@productpath/shared";
 
-export async function seedLearning(prisma: PrismaClient) {
-  const pmRole = await prisma.role.findUnique({
-    where: { slug: "product-management" },
-  });
-  if (!pmRole) {
-    console.warn("PM role not found; skip learning seed");
+type ResourceSeed = {
+  title: string;
+  type: ResourceType;
+  content?: string;
+  url?: string;
+  required: boolean;
+  sortOrder: number;
+};
+
+type ModuleSeed = {
+  slug: string;
+  title: string;
+  description: string;
+  sortOrder: number;
+  prerequisites: string[];
+  resources: ResourceSeed[];
+};
+
+type RoadmapSeed = {
+  roleSlug: string;
+  title: string;
+  description: string;
+  modules: ModuleSeed[];
+};
+
+function roadmapSeedForRole(roleSlug: string): RoadmapSeed | null {
+  const curriculum = getCurriculumForRole(roleSlug);
+  const modules = buildSeedModulesForRole(roleSlug);
+  if (!curriculum || !modules) return null;
+
+  const topicCount = curriculum.phases.reduce((sum, phase) => sum + phase.topics.length, 0);
+
+  return {
+    roleSlug,
+    title: curriculum.title,
+    description: `${topicCount} topics across ${curriculum.phases.length} phases — structured learning with curated resources.`,
+    modules: modules.map((mod) => ({
+      ...mod,
+      resources: mod.resources.map((res) => ({
+        ...res,
+        type: res.type as ResourceType,
+      })),
+    })),
+  };
+}
+
+const CURRICULUM_ROLE_SLUGS = [
+  "product-management",
+  "product-design",
+  "product-analytics",
+  "product-marketing",
+  "product-operations",
+] as const;
+
+const ROADMAP_SEEDS: RoadmapSeed[] = CURRICULUM_ROLE_SLUGS.map(roadmapSeedForRole).filter(
+  (seed): seed is RoadmapSeed => seed !== null,
+);
+
+async function seedRoadmapForRole(prisma: PrismaClient, seed: RoadmapSeed) {
+  const role = await prisma.role.findUnique({ where: { slug: seed.roleSlug } });
+  if (!role) {
+    console.warn(`Role ${seed.roleSlug} not found; skip learning seed`);
     return;
   }
 
   const roadmap = await prisma.roadmap.upsert({
-    where: { roleId_version: { roleId: pmRole.id, version: 1 } },
+    where: { roleId_version: { roleId: role.id, version: 1 } },
     update: {
-      title: "Product Management Foundations",
-      description: "Core skills and concepts for aspiring product managers.",
+      title: seed.title,
+      description: seed.description,
       published: true,
     },
     create: {
-      roleId: pmRole.id,
+      roleId: role.id,
       version: 1,
-      title: "Product Management Foundations",
-      description: "Core skills and concepts for aspiring product managers.",
+      title: seed.title,
+      description: seed.description,
       published: true,
     },
   });
 
-  const modules = [
-    {
-      slug: "intro-to-pm",
-      title: "Introduction to Product Management",
-      description: "What PMs do, how they create value, and how the role fits in a product team.",
-      sortOrder: 1,
-      prerequisites: [] as string[],
-      resources: [
-        {
-          title: "What is Product Management?",
-          type: ResourceType.ARTICLE,
-          content:
-            "Product managers align user needs, business goals, and technical feasibility. They own the why and what—not always the how.",
-          required: true,
-          sortOrder: 1,
-        },
-        {
-          title: "PM Role in Tech Teams",
-          type: ResourceType.EXTERNAL_LINK,
-          url: "https://www.mindtheproduct.com/learn/product-management/",
-          required: true,
-          sortOrder: 2,
-        },
-      ],
-    },
-    {
-      slug: "user-research-basics",
-      title: "User Research Basics",
-      description: "Learn how to frame problems and gather evidence from users.",
-      sortOrder: 2,
-      prerequisites: ["intro-to-pm"],
-      resources: [
-        {
-          title: "Problem vs Solution Space",
-          type: ResourceType.ARTICLE,
-          content:
-            "Stay in the problem space until you have evidence. Solution ideas come after you understand jobs, pains, and gains.",
-          required: true,
-          sortOrder: 1,
-        },
-        {
-          title: "Interviewing Users (Video)",
-          type: ResourceType.VIDEO,
-          url: "https://www.youtube.com/watch?v=MT4Ig2uqjTc",
-          required: true,
-          sortOrder: 2,
-        },
-        {
-          title: "Optional: Research Plan Template",
-          type: ResourceType.PDF,
-          url: "https://www.nngroup.com/reports/topic/ux-research/",
-          required: false,
-          sortOrder: 3,
-        },
-      ],
-    },
-    {
-      slug: "roadmapping",
-      title: "Roadmapping & Prioritization",
-      description: "Turn insights into a focused roadmap and communicate tradeoffs.",
-      sortOrder: 3,
-      prerequisites: ["user-research-basics"],
-      resources: [
-        {
-          title: "Outcome-Based Roadmaps",
-          type: ResourceType.ARTICLE,
-          content:
-            "Roadmaps should communicate outcomes and learning goals—not a laundry list of features with fake dates.",
-          required: true,
-          sortOrder: 1,
-        },
-        {
-          title: "Prioritization Frameworks",
-          type: ResourceType.EXTERNAL_LINK,
-          url: "https://www.productplan.com/learn/prioritization-frameworks/",
-          required: true,
-          sortOrder: 2,
-        },
-      ],
-    },
-  ];
-
   const moduleIdBySlug = new Map<string, string>();
 
-  for (const mod of modules) {
+  for (const mod of seed.modules) {
     const created = await prisma.module.upsert({
       where: { roadmapId_slug: { roadmapId: roadmap.id, slug: mod.slug } },
       update: {
@@ -132,19 +107,14 @@ export async function seedLearning(prisma: PrismaClient) {
         where: { moduleId: created.id, title: res.title },
       });
       if (existing) {
-        await prisma.resource.update({
-          where: { id: existing.id },
-          data: res,
-        });
+        await prisma.resource.update({ where: { id: existing.id }, data: res });
       } else {
-        await prisma.resource.create({
-          data: { moduleId: created.id, ...res },
-        });
+        await prisma.resource.create({ data: { moduleId: created.id, ...res } });
       }
     }
   }
 
-  for (const mod of modules) {
+  for (const mod of seed.modules) {
     const moduleId = moduleIdBySlug.get(mod.slug)!;
     await prisma.modulePrerequisite.deleteMany({ where: { moduleId } });
     for (const prereqSlug of mod.prerequisites) {
@@ -157,11 +127,30 @@ export async function seedLearning(prisma: PrismaClient) {
     }
   }
 
+  const activeSlugs = new Set(seed.modules.map((m) => m.slug));
+  await prisma.module.deleteMany({
+    where: {
+      roadmapId: roadmap.id,
+      slug: { notIn: [...activeSlugs] },
+    },
+  });
+
+  console.log(`Seeded ${seed.roleSlug} roadmap: ${roadmap.title} (${seed.modules.length} modules)`);
+}
+
+export async function seedLearning(prisma: PrismaClient) {
+  for (const seed of ROADMAP_SEEDS) {
+    await seedRoadmapForRole(prisma, seed);
+  }
+
   await prisma.featureFlag.upsert({
     where: { key: "phase1_learning" },
     update: { enabled: true },
     create: { key: "phase1_learning", enabled: true, description: "Learning roadmaps" },
   });
+}
 
-  console.log(`Seeded PM roadmap: ${roadmap.title} (${modules.length} modules)`);
+/** Maps product role slug → static career roadmap slug in apps/web. */
+export function careerRoadmapSlugForRole(roleSlug: string): string {
+  return `ai-${roleSlug}`;
 }

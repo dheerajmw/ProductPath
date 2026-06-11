@@ -16,6 +16,7 @@ import {
 } from "@productpath/ui";
 import { api, ApiError, type ProjectTemplateCard } from "@/lib/api";
 import { CandidateAppShell } from "@/components/app-shell";
+import { useAuth } from "@/lib/auth-context";
 
 function statusLabel(status: string) {
   return status.replace(/_/g, " ").toLowerCase();
@@ -23,11 +24,21 @@ function statusLabel(status: string) {
 
 export default function ProjectsHubPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const activeRoleId = user?.candidateProfile?.activeRoleId ?? null;
   const [templates, setTemplates] = useState<ProjectTemplateCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!activeRoleId) {
+      router.replace("/onboarding/role");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
     api
       .getProjectTemplates()
       .then((res) => setTemplates(res.templates))
@@ -38,32 +49,35 @@ export default function ProjectsHubPage() {
         } else setError(err instanceof ApiError ? err.message : "Failed to load");
       })
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [router, authLoading, activeRoleId]);
 
   if (loading) {
     return (
-      <CandidateAppShell title="Projects">
+      <CandidateAppShell title="Project submissions">
         <Spinner size={32} />
       </CandidateAppShell>
     );
   }
 
   return (
-    <CandidateAppShell title="Projects">
+    <CandidateAppShell title="Project submissions">
       <Card>
         <CardContent>
-          <CardTitle>Projects hub</CardTitle>
+          <CardTitle>Project submissions</CardTitle>
           <p style={{ color: "var(--pp-muted)", marginTop: 8 }}>
-            Submit proof-of-work projects for your active role. Approved projects count toward
-            interview-ready verification (Phase 5).
+            This is your main proof-of-work path. Submit projects for your active role — approved
+            work counts toward interview-ready verification.
           </p>
         </CardContent>
       </Card>
 
       <div style={{ marginTop: 16 }}>
         <Alert variant="info">
-          Skill gaps are not cleared by projects alone — retake your assessment after recommended
-          learning when ready.
+          Roadmaps are optional prep before the skill assessment.{" "}
+          <Link href="/learn" style={{ fontWeight: 600 }}>
+            Prepare to learn
+          </Link>{" "}
+          if you want structured modules first.
         </Alert>
       </div>
 

@@ -378,6 +378,40 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+
+  getMvpAssessmentRoles: () =>
+    request<{ roles: MvpAssessmentRole[] }>("/assessment/roles"),
+
+  startMvpAssessment: (body: { roleSlug: string; difficulty: "beginner" | "intermediate" }) =>
+    request<MvpAssessmentSessionResponse>("/assessment/start", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  getMvpAssessmentSession: (sessionId: string) =>
+    request<MvpAssessmentSessionResponse>(`/assessment/sessions/${sessionId}`),
+
+  submitMvpAssessmentResponse: (
+    sessionId: string,
+    body: {
+      questionId: string;
+      selectedIndex?: number;
+      textAnswer?: string;
+      currentIndex?: number;
+    },
+  ) =>
+    request<MvpAssessmentSessionResponse>(`/assessment/sessions/${sessionId}/response`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  submitMvpAssessment: (sessionId: string) =>
+    request<MvpAssessmentResultResponse>(`/assessment/sessions/${sessionId}/submit`, {
+      method: "POST",
+    }),
+
+  getMvpAssessmentResult: (sessionId: string) =>
+    request<MvpAssessmentResultResponse>(`/assessment/sessions/${sessionId}/result`),
 };
 
 export type User = {
@@ -813,4 +847,74 @@ export type SkillDevelopmentResponse = {
     sourceAttemptId: string;
     updatedAt: string;
   }[];
+};
+
+export type MvpAssessmentRole = {
+  slug: string;
+  name: string;
+  difficulties: ("beginner" | "intermediate")[];
+};
+
+export type MvpQuestionView = {
+  id: string;
+  index: number;
+  type: "mcq" | "scenario" | "short-answer";
+  question: string;
+  context?: string;
+  options?: string[];
+  skillTag: string;
+  estimatedTime: number;
+  answered: boolean;
+};
+
+export type MvpAssessmentSessionResponse = {
+  session: {
+    id: string;
+    role: string;
+    roleName: string;
+    difficulty: string;
+    status: string;
+    currentIndex: number;
+    totalQuestions: number;
+    startedAt: string;
+    expiresAt?: string;
+  };
+  questions: MvpQuestionView[];
+};
+
+export type MvpSkillBreakdown = {
+  skillTag: string;
+  skillName: string;
+  score: number;
+  maxScore: number;
+  percent: number;
+  weak: boolean;
+};
+
+export type MvpLearningResource = {
+  title: string;
+  topic: string;
+  type: string;
+  url: string;
+  difficulty: string;
+  estimated_time: number;
+};
+
+export type MvpAssessmentResultResponse = {
+  result: {
+    sessionId: string;
+    role: string;
+    roleName: string;
+    difficulty: string;
+    overallScore: number;
+    readinessLevel: string;
+    passed: boolean;
+    skillBreakdown: MvpSkillBreakdown[];
+    weakAreas: string[];
+    recommendedTopics: string[];
+    recommendedResources: MvpLearningResource[];
+    roadmapRecommendations: { topic: string; reason: string; priority: string }[];
+    aiFeedback?: string | null;
+    completedAt?: string;
+  };
 };

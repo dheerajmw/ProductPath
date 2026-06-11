@@ -13,7 +13,7 @@ type NavItem = { href: string; label: string; icon: string };
 const PRIMARY_NAV: NavItem[] = [
   { href: "/dashboard", label: "Command Center", icon: "dashboard" },
   { href: "/projects", label: "Project submissions", icon: "folder_special" },
-  { href: "/assessments", label: "Skill assessment", icon: "quiz" },
+  { href: "/assessment", label: "Skill assessment", icon: "quiz" },
   { href: "/gaps", label: "Skill gaps", icon: "analytics" },
   { href: "/profile", label: "Verification", icon: "verified" },
 ];

@@ -48,7 +48,8 @@ export default function RoleOnboardingPage() {
     setError(null);
     try {
       await api.selectRole(roleId, confirmArchive);
-      await refresh();
+      await refresh({ force: true });
+      router.refresh();
       router.push("/projects");
     } catch (err) {
       if (err instanceof ApiError && err.code === "ROLE_SWITCH_REQUIRES_CONFIRM") {

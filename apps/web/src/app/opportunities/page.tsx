@@ -271,9 +271,9 @@ export default function OpportunitiesPage() {
               <Link href="/profile">
                 <Button size="lg">Get verified to unlock</Button>
               </Link>
-              <Link href="/learn">
+              <Link href="/projects">
                 <Button size="lg" variant="secondary">
-                  Continue learning
+                  Submit a project
                 </Button>
               </Link>
             </div>

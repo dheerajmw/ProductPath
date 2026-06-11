@@ -13,6 +13,7 @@ import { RecruiterError } from "../services/recruiter.service.js";
 import { InterestError } from "../services/interest.service.js";
 import { CommunityError } from "../services/community.service.js";
 import { ModerationError } from "../services/moderation.service.js";
+import { MvpAssessmentError } from "../modules/assessment/mvp-assessment.service.js";
 import { logger } from "../lib/logger";
 
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
@@ -29,7 +30,8 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     err instanceof RecruiterError ||
     err instanceof InterestError ||
     err instanceof CommunityError ||
-    err instanceof ModerationError
+    err instanceof ModerationError ||
+    err instanceof MvpAssessmentError
   ) {
     return res.status(err.statusCode).json({ error: err.message, code: err.code });
   }

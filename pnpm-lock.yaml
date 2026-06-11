@@ -51,6 +51,9 @@ importers:
       '@prisma/client':
         specifier: ^6.9.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@productpath/assessment-mvp':
+        specifier: workspace:*
+        version: link:../../packages/assessment-mvp
       '@productpath/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -156,11 +159,24 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
+  packages/assessment-mvp:
+    dependencies:
+      zod:
+        specifier: ^3.25.51
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
   packages/database:
     dependencies:
       '@prisma/client':
         specifier: ^6.9.0
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@productpath/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6

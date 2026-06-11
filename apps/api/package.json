@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
+    "@productpath/assessment-mvp": "workspace:*",
     "@productpath/database": "workspace:*",
     "@productpath/shared": "workspace:*",
     "bcryptjs": "^3.0.2",

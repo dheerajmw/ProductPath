@@ -154,8 +154,8 @@ export default function GapsPage() {
       ) : null}
 
       <div style={{ marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <Link href="/learn">
-          <Button variant="secondary">Back to learning</Button>
+        <Link href="/learn/roadmaps">
+          <Button variant="secondary">Optional roadmaps</Button>
         </Link>
         <Link href="/assessments">
           <Button variant="secondary">Retake assessment</Button>

@@ -1,0 +1,68 @@
+import type { LearningResource } from "../../types/assessment";
+
+export const productDesignResources: LearningResource[] = [
+  {
+    title: "Laws of UX",
+    topic: "ux-thinking",
+    type: "article",
+    url: "https://lawsofux.com/",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "Nielsen Norman Group — UX articles",
+    topic: "ux-thinking",
+    type: "article",
+    url: "https://www.nngroup.com/articles/",
+    difficulty: "beginner",
+    estimated_time: 25,
+  },
+  {
+    title: "Figma Learn Design",
+    topic: "ui-understanding",
+    type: "course",
+    url: "https://www.figma.com/resources/learn-design/",
+    difficulty: "beginner",
+    estimated_time: 45,
+  },
+  {
+    title: "Refactoring UI",
+    topic: "ui-understanding",
+    type: "article",
+    url: "https://refactoringui.com/",
+    difficulty: "beginner",
+    estimated_time: 30,
+  },
+  {
+    title: "NN/g — AI user experience",
+    topic: "ai-ux-basics",
+    type: "article",
+    url: "https://www.nngroup.com/articles/ai-user-experience/",
+    difficulty: "intermediate",
+    estimated_time: 20,
+  },
+  {
+    title: "Growth Design case studies",
+    topic: "ux-thinking",
+    type: "blog",
+    url: "https://growth.design/case-studies/",
+    difficulty: "intermediate",
+    estimated_time: 35,
+  },
+  {
+    title: "Figma Help Center",
+    topic: "ui-understanding",
+    type: "tool",
+    url: "https://help.figma.com/",
+    difficulty: "beginner",
+    estimated_time: 20,
+  },
+  {
+    title: "WebAIM — contrast checker",
+    topic: "accessibility",
+    type: "tool",
+    url: "https://webaim.org/resources/contrastchecker/",
+    difficulty: "beginner",
+    estimated_time: 15,
+  },
+];

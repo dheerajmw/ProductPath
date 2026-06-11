@@ -211,8 +211,16 @@ export async function getModuleForUser(userId: string, moduleId: string) {
     },
   });
 
-  if (!mod || mod.roadmap.roleId !== profile.activeRoleId) {
-    throw new LearningError("Module not found", 404);
+  if (!mod) {
+    throw new LearningError("Module not found", 404, "MODULE_NOT_FOUND");
+  }
+
+  if (mod.roadmap.roleId !== profile.activeRoleId) {
+    throw new LearningError(
+      "This module belongs to a different role. Switch roles or open your active role roadmap.",
+      404,
+      "MODULE_ROLE_MISMATCH",
+    );
   }
 
   const allModuleIds = (

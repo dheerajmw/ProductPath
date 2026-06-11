@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageLayout, Card, CardContent, CardTitle, Input, Button, Alert, Label } from "@productpath/ui";
+import { normalizeEmail } from "@productpath/shared";
 import { api, ApiError } from "@/lib/api";
 
 export default function RecruiterOnboardingPage() {
@@ -21,10 +22,10 @@ export default function RecruiterOnboardingPage() {
     setError(null);
     try {
       await api.recruiterSignup({
-        email,
+        email: normalizeEmail(email),
         password,
-        company,
-        companyDomain: companyDomain || undefined,
+        company: company.trim(),
+        companyDomain: companyDomain.trim() || undefined,
       });
       setDone(true);
     } catch (err) {

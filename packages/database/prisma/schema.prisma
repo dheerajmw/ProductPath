@@ -120,6 +120,8 @@ model User {
   resourceProgress    UserResourceProgress[]
   assessmentAttempts       AssessmentAttempt[]
   assessmentResults        AssessmentResult[]
+  mvpAssessmentSessions    AssessmentSession[]
+  mvpAssessmentHistory     UserAssessmentHistory[]
   learningRecommendations  LearningRecommendation[]
   skillDevelopmentSnapshots SkillDevelopmentSnapshot[]
   projectSubmissions       ProjectSubmission[]
@@ -448,6 +450,92 @@ model AssessmentResult {
   verificationRecords VerificationRecord[]
 
   @@index([userId, roleId])
+}
+
+// --- MVP AI Assessment (V1 file-based question bank) ---
+
+enum MvpSessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model AssessmentSession {
+  id              String           @id @default(cuid())
+  userId          String
+  roleSlug        String
+  difficulty      String
+  status          MvpSessionStatus @default(IN_PROGRESS)
+  questionIds     Json
+  currentIndex    Int              @default(0)
+  startedAt       DateTime         @default(now()) @db.Timestamptz
+  expiresAt       DateTime?        @db.Timestamptz
+  completedAt     DateTime?        @db.Timestamptz
+  overallScore    Float?
+  readinessLevel  String?
+  passed          Boolean?
+  skillBreakdown  Json?
+  weakAreas       Json?
+  recommendations Json?
+  aiFeedback      String?
+
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses   QuestionResponse[]
+  skillScores SkillScore[]
+  history     UserAssessmentHistory?
+
+  @@index([userId, roleSlug])
+  @@index([status])
+}
+
+model QuestionResponse {
+  id             String   @id @default(cuid())
+  sessionId      String
+  questionBankId String
+  questionType   String
+  skillTag       String
+  selectedIndex  Int?
+  textAnswer     String?
+  score          Float    @default(0)
+  maxScore       Float    @default(100)
+  aiEvaluation   Json?
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt @db.Timestamptz
+
+  session AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, questionBankId])
+  @@index([sessionId])
+}
+
+model SkillScore {
+  id        String @id @default(cuid())
+  sessionId String
+  skillTag  String
+  score     Float
+  maxScore  Float
+  percent   Float
+
+  session AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, skillTag])
+}
+
+model UserAssessmentHistory {
+  id             String   @id @default(cuid())
+  userId         String
+  roleSlug       String
+  sessionId      String   @unique
+  difficulty     String
+  overallScore   Float
+  readinessLevel String
+  passed         Boolean
+  completedAt    DateTime @db.Timestamptz
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session AssessmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, roleSlug])
 }
 
 model SkillModuleMapping {
